@@ -7,6 +7,10 @@ import jwt
 from functools import wraps
 import datetime
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
+from google import genai
+from google.genai import types
+from google.genai.types import Tool, GenerateContentConfig, GoogleSearch
+import threading
 
 # Load environment variables
 load_dotenv()
@@ -15,10 +19,18 @@ load_dotenv()
 app = Flask(__name__, template_folder='templates')
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
+# Gemini API
+client = genai.Client(api_key=os.getenv('GEMINI_TOKEN'))
+google_search_tool = Tool(google_search=GoogleSearch())
+
 # JWT Configuration
 JWT_SECRET = os.getenv('JWT_SECRET')
 JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
 JWT_EXP_DELTA_SECONDS = int(os.getenv('JWT_EXPIRATION_HOURS', 24)) * 3600
+
+# AI Chat Configurations 
+chat_sessions = {}
+chat_sessions_lock = threading.Lock()
 
 # Initialize Firebase Admin SDK
 cred = credentials.Certificate({
@@ -150,6 +162,77 @@ def google_auth():
         return jsonify({'error': 'Authentication timeout'}), 504
     except Exception as e:
         return jsonify({'error': str(e)}), 401
+
+@app.route('/api/chat', methods=['POST'])
+@token_required
+def chat(current_user):
+    data = request.json
+    user_message = data.get('message')
+    if not user_message:
+        return jsonify({'error': 'No message provided'}), 400
+
+    user_id = current_user  # current_user is already the ID string
+    print(f"Processing chat for user ID: {user_id}")
+
+    # Get or create chat session
+    with chat_sessions_lock:
+        if user_id not in chat_sessions:
+            chat_sessions[user_id] = {'history': []}
+        
+        session = chat_sessions[user_id]
+    
+    try:
+        # Get user email for the username
+        user_record = auth.get_user(user_id)
+        email = user_record.email
+        username = email.split('@')[0]
+        
+        # Rest of your existing chat implementation...
+        contents = []
+        
+        if not session['history']:
+            system_prompt = f"You are VoyagerAI an AI Assistant of the company Travel Guard and you will address me as {username}. You are a friendly and knowledgeable travel companion. You Respond very concise, no filler words, no referencing other company names in your chat such as waze, google or other local news."
+            contents.append({
+                'role': 'user',
+                'parts': [{'text': system_prompt}]
+            })
+        
+        for msg in session['history']:
+            contents.append({
+                'role': msg['role'],
+                'parts': [{'text': msg['content']}]
+            })
+        
+        contents.append({
+            'role': 'user',
+            'parts': [{'text': user_message}]
+        })
+
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=contents,
+            config=GenerateContentConfig(
+                tools=[google_search_tool],
+                response_modalities=['TEXT'],
+                system_instruction=system_prompt if not session['history'] else None
+            )
+        )
+
+        session['history'].append({'role': 'user', 'content': user_message})
+        session['history'].append({'role': 'model', 'content': response.text})
+        session['history'] = session['history'][-20:]
+
+        return jsonify({
+            'response': response.text,
+            'grounding_metadata': getattr(response, 'grounding_metadata', None)
+        })
+    
+    except TimeoutError:
+        return jsonify({'error': 'Response timed out'}), 504
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/protected')
 @token_required
