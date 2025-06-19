@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Travel Guard - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.9/dist/typography.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -74,6 +76,25 @@
             transform: translateY(0);
         }
 
+        /* Custom CHAT styling for better appearance */
+        #chatMessages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #chatMessages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        #chatMessages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        #chatMessages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
         @media (max-width: 640px) {
             .modal-content {
                 padding: 1rem;
@@ -122,22 +143,32 @@
     <div id="chatModal" class="modal-overlay">
         <div class="modal-content card-shadow" style="max-width: 500px;">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800">VoyagerAI: Travel Companion </h3>
+                <h3 class="text-l font-bold text-gray-800">VoyagerAI: Travel Companion </h3>
                 <button onclick="closeChatModal()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
-            <div id="chatMessages" class="h-64 overflow-y-auto mb-4 space-y-2">
-                <div class="bg-blue-100 p-3 rounded-lg max-w-[80%]">
-                    <p class="text-sm">Hello! How can I help you with your travel safety today?</p>
+            <div id="chatMessages" class="h-[460px] overflow-y-auto mb-4 space-y-4 px-2">
+                <!-- Welcome Message -->
+                <div class="flex flex-col items-start" style="font-size: 14px;">
+                    <div class="bg-blue-100 p-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm">
+                        <p class="font-sm text-blue-800 mb-1">Hi <span class="font-semibold">{{ user.email.split('@')[0] }}</span>! I am Voyager AI your travel companion!</p>
+                        <p class="text-xs text-gray-700 mb-2">I can help with:</p>
+                        <ul class="list-disc list-inside text-sm space-y-1 text-gray-700 pl-2" style="font-size: 12px;">
+                            <li>Nearest Emergency Contact?</li>
+                            <li>Is there nearby traffic?</li>
+                            <li>Is it safe to travel there in the current weather condition?</li>
+                        </ul>
+                    </div>
+                    <span class="text-xs text-gray-500 mt-1 ml-2">Today at <span id="current-time"></span></span>
                 </div>
             </div>
             
             <div class="flex space-x-2">
                 <input id="chatInput" type="text" placeholder="Type your message..." 
-                       class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
-                <button onclick="sendChatMessage()" class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                       class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500" style="font-size: 12px;">
+                <button onclick="sendChatMessage()" class="p-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
@@ -286,6 +317,11 @@
             document.getElementById('chatModal').classList.remove('active');
         }
 
+        // Display current time
+        const now = new Date();
+        document.getElementById('current-time').textContent = 
+            now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
@@ -294,33 +330,79 @@
                 
                 // Add user message
                 chatContainer.innerHTML += `
-                    <div class="bg-gray-100 p-3 rounded-lg max-w-[80%] ml-auto">
-                        <p class="text-sm">${message}</p>
+                    <div class="bg-gray-300 p-3 rounded-lg max-w-[80%] ml-auto">
+                        <p class="text-xs">${message}</p>
                     </div>
                 `;
                 
                 // Clear input
                 input.value = '';
                 
-                // Simulate bot response after delay
-                setTimeout(() => {
-                    const responses = [
-                        "I can help you with travel safety tips and advice.",
-                        "Would you like information about your current location?",
-                        "I can provide emergency contacts for your area.",
-                        "Let me know if you need any specific safety information."
-                    ];
-                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                // Add typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.id = 'typing-indicator';
+                typingIndicator.className = 'bg-blue-200 p-3 rounded-lg max-w-[80%]';
+                typingIndicator.innerHTML = `
+                    <div class="flex space-x-1">
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                    </div>
+                `;
+                chatContainer.appendChild(typingIndicator);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                
+                // Send to server
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    // Remove typing indicator
+                    const indicator = document.getElementById('typing-indicator');
+                    if (indicator) indicator.remove();
                     
-                    chatContainer.innerHTML += `
-                        <div class="bg-blue-100 p-3 rounded-lg max-w-[80%]">
-                            <p class="text-sm">${randomResponse}</p>
-                        </div>
-                    `;
+                    if (data.response) {
+                        const formatted = marked.parse(data.response);
+                        chatContainer.innerHTML += `
+                            <div class="bg-blue-200 p-3 rounded-lg max-w-[80%] prose prose-sm prose-blue" style="font-size: 12px">
+                                ${formatted}
+                            </div>
+                        `;
+                    } else if (data.error) {
+                        chatContainer.innerHTML += `
+                            <div class="bg-red-200 p-3 rounded-lg max-w-[80%]">
+                                <p class="text-xs">Error: ${data.error}</p>
+                            </div>
+                        `;
+                    }
                     
                     // Scroll to bottom
                     chatContainer.scrollTop = chatContainer.scrollHeight;
-                }, 800);
+                })
+                .catch(error => {
+                    // Remove typing indicator
+                    const indicator = document.getElementById('typing-indicator');
+                    if (indicator) indicator.remove();
+                    
+                    chatContainer.innerHTML += `
+                        <div class="bg-red-100 p-3 rounded-lg max-w-[80%]">
+                            <p class="text-sm">Error: ${error.message}</p>
+                        </div>
+                    `;
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                });
                 
                 // Scroll to bottom
                 chatContainer.scrollTop = chatContainer.scrollHeight;
