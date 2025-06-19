@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Travel Guard - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 400px;
+            padding: 1.5rem;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .modal-content svg {
+            animation: bounce 1s ease infinite;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .modal-content {
+                padding: 1rem;
+                width: 95%;
+            }
+
+            .modal-content svg {
+                height: 10vw;
+                width: 10vw;
+            }
+
+            .floating-btns {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-2 bg-gray-100">
+    <div class="max-w-md mx-auto">
+        <!-- Welcome Modal -->
+    <div id="welcomeModal" class="modal-overlay">
+        <div class="modal-content card-shadow">
+            <div class="flex justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                Welcome, <span id="userName">
+                {% if user is string %}
+                    {{ user }}
+                {% else %}
+                    {{ user.email.split('@')[0] }}
+                {% endif %}
+                </span>!
+            </h2></span></h2>
+            <p class="text-gray-600 mb-6">You've successfully logged in to Travel Guard</p>
+            <button id="closeModal" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Continue to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="modal-overlay">
+        <div class="modal-content card-shadow" style="max-width: 500px;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">VoyagerAI: Travel Companion </h3>
+                <button onclick="closeChatModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="chatMessages" class="h-64 overflow-y-auto mb-4 space-y-2">
+                <div class="bg-blue-100 p-3 rounded-lg max-w-[80%]">
+                    <p class="text-sm">Hello! How can I help you with your travel safety today?</p>
+                </div>
+            </div>
+            
+            <div class="flex space-x-2">
+                <input id="chatInput" type="text" placeholder="Type your message..." 
+                       class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <button onclick="sendChatMessage()" class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-content card-shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Settings</h3>
+                <button onclick="closeSettingsModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-3">
+                <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-user-circle text-gray-600 mr-3"></i>
+                    <span>Edit Profile</span>
+                </button>
+                
+                <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-bell text-gray-600 mr-3"></i>
+                    <span>Notification Settings</span>
+                </button>
+                
+                <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-shield-alt text-gray-600 mr-3"></i>
+                    <span>Privacy Settings</span>
+                </button>
+                
+                <button onclick="window.location.href='/logout'" 
+                        class="w-full flex items-center p-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors mt-4">
+                    <i class="fas fa-sign-out-alt mr-3"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <!-- <div class="fixed bottom-6 right-6 z-50">
+        <div class="flex flex-col space-y-3">
+            <button onclick="openChatModal()" class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all active:scale-95">
+                <i class="fas fa-comment text-xl"></i>
+            </button>
+            <button onclick="openSettingsModal()" class="w-14 h-14 bg-gradient-to-br from-gray-700 to-gray-800 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all active:scale-95">
+                <i class="fas fa-cog text-xl"></i>
+            </button>
+        </div>
+    </div> -->
+
+    <!-- Dashboard Content -->
+    <div class="w-full">
+        <div class="bg-white rounded-2xl p-6 card-shadow">
+            <!-- Travel Guard Logo -->
+            <div class="flex justify-center mb-8">
+                <div class="text-center">
+                    <div class="flex items-center justify-center">
+                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-xl shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <span class="ml-3 text-2xl font-bold text-gray-800">Travel Guard</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Welcome back, {{ user.email }}</p>
+                </div>
+            </div>
+
+            <!-- Dashboard Buttons -->
+            <div class="w-full max-w-sm">
+                <div class="bg-white rounded-xl p-4 card-shadow space-y-4">
+                    <!-- Existing Feature Buttons -->
+                    <button onclick="location.href='#'" class="w-full flex flex-col items-center justify-center p-4 bg-blue-70 rounded-xl hover:bg-blue-100 transition-all active:scale-95 transform hover:scale-[1.02]">
+                        <div class="bg-blue-100 p-3 rounded-full mb-2">
+                            <i class="fas fa-location-arrow text-blue-600"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">Share Live Location</span>
+                        <span class="text-xs text-gray-500 mt-1">Keep friends and family in the loop</span>
+                    </button>
+        
+                    <button onclick="location.href='#'" class="w-full flex flex-col items-center justify-center p-4 bg-green-70 rounded-xl hover:bg-green-100 transition-all active:scale-95 transform hover:scale-[1.02]">
+                        <div class="bg-green-100 p-3 rounded-full mb-2">
+                            <i class="fas fa-bus text-green-600"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">Log PUV Details</span>
+                        <span class="text-xs text-gray-500 mt-1">Help keep public transport safe</span>
+                    </button>
+        
+                    <button onclick="location.href='#'" class="w-full flex flex-col items-center justify-center p-4 bg-purple-70 rounded-xl hover:bg-purple-100 transition-all active:scale-95 transform hover:scale-[1.02]">
+                        <div class="bg-purple-100 p-3 rounded-full mb-2">
+                            <i class="fas fa-tshirt text-purple-600"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">Outfit Tracking</span>
+                        <span class="text-xs text-gray-500 mt-1">Let friends and family track what you're wearing</span>
+                    </button>
+        
+                    <!-- New Row for Chat and Settings -->
+                    <div class="flex gap-3">
+                        <button onclick="openChatModal()" class="flex-1 flex flex-col items-center justify-center p-4 bg-blue-70 rounded-xl hover:bg-blue-100 transition-all active:scale-95 transform hover:scale-[1.02]">
+                            <div class="bg-blue-100 p-2 rounded-full mb-2">
+                                <i class="fas fa-comment text-blue-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-800 text-sm">VoyagerAI</span>
+                        </button>
+                        <button onclick="openSettingsModal()" class="flex-1 flex flex-col items-center justify-center p-4 bg-gray-70 rounded-xl hover:bg-gray-100 transition-all active:scale-95 transform hover:scale-[1.02]">
+                            <div class="bg-gray-100 p-2 rounded-full mb-2">
+                                <i class="fas fa-cog text-gray-700"></i>
+                            </div>
+                            <span class="font-medium text-gray-800 text-sm">Settings</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Welcome Modal Functions
+        function closeModal() {
+            document.getElementById('welcomeModal').classList.remove('active');
+        }
+
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        setTimeout(closeModal, 6000);
+
+        // Settings Modal Functions
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        // Chat Modal Functions
+        function openChatModal() {
+            document.getElementById('chatModal').classList.add('active');
+        }
+
+        function closeChatModal() {
+            document.getElementById('chatModal').classList.remove('active');
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                const chatContainer = document.getElementById('chatMessages');
+                
+                // Add user message
+                chatContainer.innerHTML += `
+                    <div class="bg-gray-100 p-3 rounded-lg max-w-[80%] ml-auto">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                `;
+                
+                // Clear input
+                input.value = '';
+                
+                // Simulate bot response after delay
+                setTimeout(() => {
+                    const responses = [
+                        "I can help you with travel safety tips and advice.",
+                        "Would you like information about your current location?",
+                        "I can provide emergency contacts for your area.",
+                        "Let me know if you need any specific safety information."
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    
+                    chatContainer.innerHTML += `
+                        <div class="bg-blue-100 p-3 rounded-lg max-w-[80%]">
+                            <p class="text-sm">${randomResponse}</p>
+                        </div>
+                    `;
+                    
+                    // Scroll to bottom
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 800);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        // Initialize welcome modal with animation
+        window.onload = function() {
+            const modal = document.getElementById('welcomeModal');
+            modal.classList.add('active');
+            
+            // Allow pressing Enter in chat input
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        };
+    </script>
+</body>
+</html>

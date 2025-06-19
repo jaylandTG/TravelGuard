@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Travel Guard - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .google-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .google-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+        }
+        
+        .travel-guard-logo::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: #3b82f6;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+                display: block;
+            }
+            
+            .card-shadow {
+                box-shadow: 0 2px 10px -3px rgba(0, 0, 0, 0.1);
+            }
+            
+            input, button {
+                font-size: 16px;
+            }
+            
+            .travel-guard-logo svg {
+                height: 8vw;
+                width: 8vw;
+            }
+            
+            .travel-guard-logo span {
+                font-size: 5vw;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 sm:p-6">
+    <div class="w-full max-w-md mx-auto">
+        <div class="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 card-shadow">
+            <!-- Travel Guard Logo -->
+            <div class="flex justify-center mb-6 sm:mb-8 travel-guard-logo">
+                <div class="text-center">
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 sm:h-10 sm:w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <span class="ml-2 text-xl sm:text-2xl font-bold text-gray-800">Travel Guard</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Your journey's safety companion</p>
+                </div>
+            </div>
+            
+            <!-- Welcome Message -->
+            <div class="text-center mb-6 sm:mb-8">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Welcome Back</h2>
+                <p class="text-sm text-gray-500">Sign in to access your travel protection</p>
+            </div>
+            
+            <!-- Google Login Button -->
+            <div class="mb-4 sm:mb-6">
+                <button id="googleLoginBtn" class="w-full flex items-center justify-center py-2 sm:py-3 px-4 border border-gray-300 rounded-lg google-btn bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <img src="static/google.svg" alt="Google logo" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3">
+                    <span class="text-sm sm:text-base">Continue with Google</span>
+                </button>
+            </div>
+            
+            <!-- Sign Up Link -->
+            <div class="mt-4 sm:mt-6 text-center">
+                <p class="text-xs sm:text-sm text-gray-600">
+                    Don't have an account? 
+                    <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Sign up</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer Links -->
+        <div class="mt-4 sm:mt-6 text-center text-xs text-gray-500">
+            <a href="#" class="hover:text-gray-700">Terms</a>
+            <span class="mx-1 sm:mx-2">•</span>
+            <a href="#" class="hover:text-gray-700">Privacy</a>
+            <span class="mx-1 sm:mx-2">•</span>
+            <a href="#" class="hover:text-gray-700">Contact</a>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration from Flask template
+        const firebaseConfig = {{ firebase_config|tojson|safe }};
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Google login functionality
+        document.getElementById('googleLoginBtn').addEventListener('click', async function() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await firebase.auth().signInWithPopup(provider);
+                const idToken = await result.user.getIdToken();
+
+                const response = await fetch('/api/auth/google', {
+                    method: 'POST',
+                    credentials: 'include',  // Crucial for cookies
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id_token: idToken })
+                });
+
+                if (response.ok) {
+                    // Cookie is automatically stored
+                    window.location.href = '/dashboard';  // Simple redirect now works
+                } else {
+                    throw new Error('Login failed');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed: ' + error.message);
+                firebase.auth().signOut();
+            }
+        });
+        
+        // Check auth state
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                console.log('User is signed in:', user);
+            } else {
+                console.log('User is signed out');
+            }
+        });
+    </script>
+</body>
+</html>
