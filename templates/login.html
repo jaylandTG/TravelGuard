@@ -125,39 +125,46 @@
         
         // Google login functionality
         document.getElementById('googleLoginBtn').addEventListener('click', async function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await firebase.auth().signInWithPopup(provider);
                 const idToken = await result.user.getIdToken();
-
+    
                 const response = await fetch('/api/auth/google', {
                     method: 'POST',
-                    credentials: 'include',  // Crucial for cookies
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id_token: idToken })
+                    body: JSON.stringify({ id_token: idToken})
                 });
-
+    
+                const data = await response.json();
+    
                 if (response.ok) {
-                    // Cookie is automatically stored
-                    window.location.href = '/dashboard';  // Simple redirect now works
+                    // Store JWT token in localStorage for API calls
+                    localStorage.setItem('jwt_token', data.token);
+                    
+                    // Redirect based on user status
+                    if (data.is_new_user) {
+                        window.location.href = '/dashboard';
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
                 } else {
-                    throw new Error('Login failed');
+                    throw new Error(data.error || 'Login failed');
                 }
             } catch (error) {
                 console.error('Login error:', error);
                 alert('Login failed: ' + error.message);
                 firebase.auth().signOut();
-            }
-        });
-        
-        // Check auth state
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                console.log('User is signed in:', user);
-            } else {
-                console.log('User is signed out');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<img src="static/google.svg" alt="Google logo" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3"><span class="text-sm sm:text-base">Continue with Google</span>';
             }
         });
     </script>
