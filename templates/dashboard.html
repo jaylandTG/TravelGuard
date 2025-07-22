@@ -4,19 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Travel Guard - Dashboard</title>
-    
     <!-- Preload critical resources -->
-    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdn.tailwindcss.com " as="script">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" as="style">
-    
     <!-- CSS -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.9/dist/typography.min.css" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href=" https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href=" https://cdn.jsdelivr.net/npm/ @tailwindcss/typography@0.5.9/dist/typography.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css ">
     <link rel="stylesheet" type="text/css" href="static/dashboard.css">
 </head>
-
 <body class="flex items-center justify-center min-h-screen p-2 bg-gray-100">
     <div class="max-w-md mx-auto">
         <!-- Welcome Modal -->
@@ -35,18 +31,16 @@
                         {{ user.email.split('@')[0] }}
                     {% endif %}
                     </span>!
-                </h2></span></h2>
+                </h2>
                 <p class="text-gray-600 mb-6">You've successfully logged in to Travel Guard</p>
                 <button id="closeModal" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     Continue to Dashboard
                 </button>
             </div>
         </div>
-    
         <!-- Onboarding Modal -->
         <div id="onboardingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
             <div class="bg-white rounded-xl p-6 w-full max-w-md">
-    
                 <!-- Step 1: Welcome Message -->
                 <div id="step1" class="step">
                     <h3 class="text-2xl font-bold mb-4 text-center">👋 Welcome to TravelGuard!</h3>
@@ -57,7 +51,6 @@
                         Get Started
                     </button>
                 </div>
-    
                 <!-- Step 2: Phone Verification -->
                 <div id="step2" class="hidden step">
                     <h3 class="text-xl font-bold mb-4">📱 Add Your Phone Number</h3>
@@ -68,7 +61,6 @@
                         <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Continue</button>
                     </div>
                 </div>
-    
                 <!-- Step 3: Emergency Contact -->
                 <div id="step3" class="hidden step">
                     <h3 class="text-xl font-bold mb-4">🆘 Add Emergency Contact</h3>
@@ -86,23 +78,19 @@
                         <button onclick="completeOnboarding()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Finish Setup</button>
                     </div>
                 </div>
-    
                 <!-- Step 4: Success/Error Message -->
                 <div id="step4" class="hidden step text-center">
                     <h3 class="text-xl font-bold mb-4 text-green-600">✅ Setup Complete!</h3>
                     <p class="text-gray-600 mb-4">Thank you for setting up your profile. You can now use all features of TravelGuard.</p>
                     <button onclick="closeOnboardingModal()" class="w-full bg-green-600 text-white py-2 rounded-lg">Continue</button>
                 </div>
-    
                 <div id="stepError" class="hidden step text-center">
                     <h3 class="text-xl font-bold mb-4 text-red-600">❌ Something went wrong</h3>
                     <p class="text-gray-600 mb-4">We couldn't save your profile. Please try again later.</p>
                     <button onclick="closeOnboardingModal()" class="w-full bg-red-600 text-white py-2 rounded-lg">Close</button>
                 </div>
-    
             </div>
         </div>
-    
         <!-- Chat Modal -->
         <div id="chatModal" class="modal-overlay">
             <div class="modal-content card-shadow" style="max-width: 500px;">
@@ -112,7 +100,6 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                
                 <div id="chatMessages" class="h-[460px] overflow-y-auto mb-4 space-y-4 px-2">
                     <!-- Welcome Message -->
                     <div class="flex flex-col items-start" style="font-size: 14px;">
@@ -128,7 +115,6 @@
                         <span class="text-xs text-gray-500 mt-1 ml-2">Today at <span id="current-time"></span></span>
                     </div>
                 </div>
-                
                 <div class="flex space-x-2">
                     <input id="chatInput" type="text" placeholder="Type your message..." 
                            class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500" style="font-size: 12px;">
@@ -140,7 +126,6 @@
                 </div>
             </div>
         </div>
-    
         <!-- Settings Modal -->
         <div id="settingsModal" class="modal-overlay">
             <div class="modal-content card-shadow">
@@ -150,23 +135,19 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                
                 <div class="space-y-3">
                     <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-user-circle text-gray-600 mr-3"></i>
                         <span>Edit Profile</span>
                     </button>
-                    
                     <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-bell text-gray-600 mr-3"></i>
                         <span>Notification Settings</span>
                     </button>
-                    
                     <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-shield-alt text-gray-600 mr-3"></i>
                         <span>Privacy Settings</span>
                     </button>
-                    
                     <button onclick="window.location.href='/logout'" 
                             class="w-full flex items-center p-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors mt-4">
                         <i class="fas fa-sign-out-alt mr-3"></i>
@@ -175,7 +156,6 @@
                 </div>
             </div>
         </div>
-    
         <!-- Location Sharing Modal -->
         <div id="locationSharingModal" class="modal-overlay">
             <div class="modal-content card-shadow" style="max-width: 500px;">
@@ -210,7 +190,6 @@
                         <button onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded">Next</button>
                     </div>
                 </div>
-
                 <!-- Step 2: Emergency Contacts -->
                 <div id="locationStep2" class="hidden step p-4">
                     <h3 class="text-xl font-bold mb-4">🆘 Emergency Contacts</h3>
@@ -218,14 +197,12 @@
                         <i class="fas fa-times"></i>
                     </button>
                     <p class="text-sm text-gray-600 mb-4">Select 1-2 emergency contacts to notify</p>
-                    
                     <div id="emergencyContactsList" class="space-y-3 mb-4 max-h-64 overflow-y-auto">
                         <!-- Loading state -->
                         <div class="text-center py-4" id="contactsLoading">
                             <div class="animate-spin inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
                             <p class="mt-2 text-sm text-gray-500">Loading contacts...</p>
                         </div>
-                        
                         <div id="noContactsMessage" class="hidden text-center py-4">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -235,16 +212,13 @@
                                 Add contacts in settings
                             </button>
                         </div>
-                        
                         <div id="contactsContainer" class="hidden space-y-3"></div>
                     </div>
-                    
                     <div class="flex justify-between mt-6">
                         <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-200 rounded-lg">Back</button>
                         <button id="nextStepBtn" onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded-lg" disabled>Next</button>
                     </div>
                 </div>
-
                 <!-- Step 3: Destination -->
                 <div id="locationStep3" class="hidden step p-4">
                     <h3 class="text-xl font-bold mb-4">📍 Destination</h3>
@@ -257,17 +231,12 @@
                     </div>
                     <div class="relative">
                         <div id="mapContainer" class="h-64 bg-gray-100 rounded-lg mb-4"></div>
-                        <button onclick="clearMarker()" class="absolute top-2 left-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-times text-red-500"></i>
-                        </button>
                     </div>
                     <div class="flex justify-between mt-6">
                         <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-200 rounded">Back</button>
                         <button onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded">Next</button>
                     </div>
                 </div>
-
-                
                 <!-- Step 4: Confirmation -->
                 <div id="locationStep4" class="hidden step p-4">
                     <h3 class="text-xl font-bold mb-4">✅ Confirm Details</h3>
@@ -277,23 +246,33 @@
                     <div class="bg-gray-50 p-4 rounded-lg mb-4">
                         <h4 class="font-medium mb-2">Vehicle Information</h4>
                         <div id="confirmPuvDetails" class="text-sm text-gray-600 space-y-1"></div>
-                        
                         <h4 class="font-medium mt-4 mb-2">Emergency Contacts</h4>
                         <div id="confirmContacts" class="text-sm text-gray-600 space-y-1"></div>
-                        
                         <h4 class="font-medium mt-4 mb-2">Destination</h4>
                         <div id="confirmDestination" class="text-sm text-gray-600"></div>
+                        <!-- Shareable Link Section -->
+                        <div id="shareLinkContainer" class="hidden mt-4">
+                            <h4 class="font-medium mb-2">Shareable Link</h4>
+                            <div class="flex items-center">
+                                <input id="shareableLinkInput" type="text" readonly 
+                                       class="flex-1 p-2 border rounded-l-lg text-sm bg-white">
+                                <button onclick="copyShareableLink()" 
+                                        class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Share this link with others to track your trip</p>
+                        </div>
                     </div>
                     <div class="flex justify-between mt-6">
                         <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-200 rounded">Back</button>
-                        <button onclick="startLocationSharing()" class="px-4 py-2 bg-green-600 text-white rounded">Start Traveling</button>
+                        <button onclick="startLocationSharing()" class="px-4 py-2 bg-green-600 text-white rounded">
+                            Start Traveling
+                        </button>
                     </div>
-                    
                 </div>
             </div>
         </div>
-
-    
         <!-- Dashboard Content -->
         <div class="w-full">
             <div class="bg-white rounded-2xl p-8 card-shadow">
@@ -311,7 +290,6 @@
                         <p class="text-sm text-gray-500 mt-2">Welcome back, {{ user.email }}</p>
                     </div>
                 </div>
-    
                 <!-- Dashboard Buttons -->
                 <div class="w-full max-w-sm">
                     <div class="bg-white rounded-xl p-6 card-shadow space-y-4">
@@ -323,7 +301,6 @@
                             <span class="font-medium text-gray-800">Share Live Location</span>
                             <span class="text-xs text-gray-500 mt-1">Keep friends and family in the loop</span>
                         </button>
-            
                         <button onclick="location.href='#'" class="w-full flex flex-col items-center justify-center p-4 bg-green-70 rounded-xl hover:bg-green-100 transition-all active:scale-95 transform hover:scale-[1.02]">
                             <div class="bg-green-100 p-3 rounded-full mb-2">
                                 <i class="fas fa-bus text-green-600"></i>
@@ -331,7 +308,6 @@
                             <span class="font-medium text-gray-800">Travel History</span>
                             <span class="text-xs text-gray-500 mt-1">Track public transport history</span>
                         </button>
-            
                         <button onclick="location.href='#'" class="w-full flex flex-col items-center justify-center p-4 bg-purple-70 rounded-xl hover:bg-purple-100 transition-all active:scale-95 transform hover:scale-[1.02]">
                             <div class="bg-purple-100 p-3 rounded-full mb-2">
                                 <i class="fas fa-map-marked-alt text-purple-600"></i>
@@ -339,7 +315,6 @@
                             <span class="font-medium text-gray-800">Preset Destinations</span>
                             <span class="text-xs text-gray-500 mt-1">Make travel plans ahead</span>
                         </button>                        
-            
                         <!-- New Row for Chat and Settings -->
                         <div class="flex gap-3">
                             <button onclick="openChatModal()" class="flex-1 flex flex-col items-center justify-center p-4 bg-blue-70 rounded-xl hover:bg-blue-100 transition-all active:scale-95 transform hover:scale-[1.02]">
@@ -359,12 +334,15 @@
                 </div>
             </div>
         </div>
-
-
     <!-- Deferred Scripts -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
-    
+    <script src="https://cdn.tailwindcss.com " defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js " defer></script>
+
+    <!-- Google Maps Script
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&loading=async&libraries=places,geometry,marker&callback=initMap">
+    </script> -->
+
     <!-- Inline Critical JS -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -376,29 +354,23 @@
                     minute: '2-digit' 
                 });
             }
-            
             // Basic modal handlers
             window.closeModal = function() {
                 document.getElementById('welcomeModal')?.classList.remove('active');
             };
-            
             window.openSettingsModal = function() {
                 document.getElementById('settingsModal')?.classList.add('active');
             };
-            
             window.closeSettingsModal = function() {
                 document.getElementById('settingsModal')?.classList.remove('active');
             };
-            
             window.openChatModal = function() {
                 document.getElementById('chatModal')?.classList.add('active');
                 document.getElementById('chatInput')?.focus();
             };
-            
             window.closeChatModal = function() {
                 document.getElementById('chatModal')?.classList.remove('active');
             };
-            
             // Check for new user
             const isNewUser = {{ user.is_new_user | tojson }};
             if (isNewUser) {
@@ -408,12 +380,9 @@
                 document.getElementById('welcomeModal')?.classList.add('active');
                 setTimeout(closeModal, 4000);
             }
-    
-            
-            
         });
     </script>
-    
+
     <!-- Main JS (deferred) -->
     <script defer>
         // Chat functionality
@@ -421,10 +390,8 @@
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             if (!message) return;
-            
             const chatContainer = document.getElementById('chatMessages');
             if (!chatContainer) return;
-            
             // Add user message
             chatContainer.insertAdjacentHTML('beforeend', `
                 <div class="flex justify-end mb-2">
@@ -433,9 +400,7 @@
                     </div>
                 </div>
             `);
-            
             input.value = '';
-            
             // Add typing indicator
             chatContainer.insertAdjacentHTML('beforeend', `
                 <div id="typing-indicator" class="flex mb-2">
@@ -448,10 +413,7 @@
                     </div>
                 </div>
             `);
-            
             chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            // Send message to server
             fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -461,14 +423,12 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('typing-indicator')?.remove();
-                
                 if (data.response) {
                     chatContainer.insertAdjacentHTML('beforeend', `
                         <div class="flex mb-2">
                             <div class="text-xs bg-blue-200 p-3 rounded-lg max-w-[80%] prose prose-xs prose-blue">
                                 ${marked.parse(data.response)}
                             </div>
-
                         </div>
                     `);
                 } else if (data.error) {
@@ -494,33 +454,22 @@
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             });
         }
-        
-        // Chat input event listener
-        document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendChatMessage();
-            }
-        });
-        
+
         // Onboarding flow
         let currentStep = 1;
-        
         function showStep(stepNumber) {
             document.querySelectorAll('.step').forEach(step => {
                 step.classList.toggle('hidden', step.id !== `step${stepNumber}`);
             });
         }
-        
         function nextStep() {
             currentStep = Math.min(currentStep + 1, 4);
             showStep(currentStep);
         }
-        
         function prevStep() {
             currentStep = Math.max(currentStep - 1, 1);
             showStep(currentStep);
         }
-        
         function completeOnboarding() {
             const phone = document.getElementById('phoneInput')?.value;
             const contact = {
@@ -528,7 +477,6 @@
                 phone: document.getElementById('contactPhone')?.value,
                 relationship: document.getElementById('contactRelation')?.value
             };
-            
             fetch('/api/complete-profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -538,19 +486,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    showStep(4); // Show success step
-                setTimeout(() => {
-                    document.getElementById('onboardingModal')?.classList.add('hidden');
-                }, 2500); // Give time for user to see success
-            }
+                    showStep(4);
+                    setTimeout(() => {
+                        document.getElementById('onboardingModal')?.classList.add('hidden');
+                    }, 2500);
+                }
             })
             .catch(() => showStep('Error'));
         }
-        
-        function closeOnboardingModal() {
-            document.getElementById('onboardingModal')?.classList.add('hidden');
-        }
-
 
         // Location Sharing Flow
         let locationSharingData = {
@@ -559,21 +502,20 @@
             destination: {},
             session_id: null
         };
-
         let currentLocationStep = 1;
         let watchPositionId = null;
+        let map, directionsService, directionsRenderer;
+        let autocomplete;
+        let sharingMapMarker;
 
         function openLocationSharing() {
             showToast('Preparing location sharing...', 'info');
-            
             if (typeof google === 'undefined' || !google.maps) {
                 loadGoogleMaps();
             } else {
                 document.getElementById('locationSharingModal').classList.add('active');
                 loadEmergencyContacts();
                 initMap(false);
-                
-                // Force show the map container
                 setTimeout(() => {
                     if (map) google.maps.event.trigger(map, 'resize');
                 }, 300);
@@ -581,13 +523,14 @@
         }
 
         function closeLocationSharing() {
-            document.getElementById('locationSharingModal').classList.remove('active');
-            resetLocationSharing();
+            if (confirm('Are you sure you want to cancel? Your progress will not be saved.')) {
+                document.getElementById('locationSharingModal').classList.remove('active');
+                resetLocationSharing();
+            }
         }
 
         function nextLocationStep() {
             if (!validateCurrentStep()) return;
-            
             currentLocationStep++;
             showLocationStep(currentLocationStep);
         }
@@ -608,64 +551,230 @@
                 case 1:
                     const puvType = document.getElementById('puvType').value;
                     const plateNumber = document.getElementById('plateNumber').value.trim();
-                    
                     if (!puvType || !plateNumber) {
                         alert('Please fill in all required fields');
                         return false;
                     }
-                    
                     locationSharingData.puv_details = {
                         type: puvType,
                         plate_number: plateNumber,
                         notes: document.getElementById('puvNotes').value.trim()
                     };
                     break;
-                    
                 case 2:
                     const selectedContacts = Array.from(
                         document.querySelectorAll('#emergencyContactsList input[type="checkbox"]:checked')
                     );
-                    
                     if (selectedContacts.length === 0) {
                         showToast('Please select at least one emergency contact', 'error');
                         return false;
                     }
-                    
-                    if (selectedContacts.length > 2) {
-                        showToast('Maximum 2 contacts allowed', 'error');
-                        return false;
-                    }
-                    
                     locationSharingData.emergency_contacts = selectedContacts.map(checkbox => {
-                        const contact = JSON.parse(checkbox.value);
-                        return {
-                            id: contact.id,
-                            name: contact.name,
-                            phone: contact.phone,
-                            relationship: contact.relationship || 'contact'
-                        };
+                        return JSON.parse(checkbox.value);
                     });
                     break;
-                    
                 case 3:
                     const destination = document.getElementById('destinationInput').value.trim();
                     if (!destination) {
                         alert('Please enter a destination');
                         return false;
                     }
-                    
-                    // In a real app, you would get the full place details from Google Places API
                     locationSharingData.destination = {
                         address: destination,
-                        coordinates: null // Would be set from Places API in real implementation
+                        coordinates: sharingMapMarker ? {
+                            lat: sharingMapMarker.position.lat,
+                            lng: sharingMapMarker.position.lng
+                        } : null
                     };
-                    
-                    // Update confirmation view
                     updateConfirmationView();
                     break;
             }
-            
             return true;
+        }
+
+        function initMap(shouldOpenModal = true) {
+            if (!window.MAP_CONFIG?.mapId) {
+                console.error('Map ID not found in config');
+                showToast('Map configuration error', 'error');
+                return;
+            }
+
+            try {
+                
+                map = new google.maps.Map(document.getElementById('mapContainer'), {
+                    center: { lat: 14.5995, lng: 120.9842 },
+                    zoom: 13,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    mapId: window.MAP_CONFIG.mapId
+                });
+
+                if (!google.maps.places) {
+                    throw new Error('Places library not loaded');
+                }
+
+
+                directionsService = new google.maps.DirectionsService();
+                directionsRenderer = new google.maps.DirectionsRenderer();
+                directionsRenderer.setMap(map);
+
+                const input = document.getElementById('destinationInput');
+                const autocomplete = new google.maps.places.Autocomplete(input, {
+                    types: ['geocode'],
+                    componentRestrictions: { country: 'ph' }
+                });
+
+                autocomplete.addListener('place_changed', () => {
+                    const place = autocomplete.getPlace();
+                    if (!place.geometry) return;
+
+                    const loc = place.geometry.location;
+                    if (!sharingMapMarker) {
+                        const pin = new google.maps.marker.PinElement({
+                            background: '#4285F4',
+                            borderColor: '#ffffff',
+                            glyphColor: '#ffffff',
+                            scale: 1.5
+                        });
+                        pin.element.classList.add('bounce-marker');
+                        sharingMapMarker = new google.maps.marker.AdvancedMarkerElement({
+                            position: { lat: loc.lat(), lng: loc.lng() },
+                            map: map,
+                            content: pin.element
+                        });
+                        setTimeout(() => pin.element.classList.remove('bounce-marker'), 750);
+                    } else {
+                        sharingMapMarker.position = { lat: loc.lat(), lng: loc.lng() };
+                        const pin = sharingMapMarker.content;
+                        pin.classList.add('bounce-marker');
+                        setTimeout(() => pin.classList.remove('bounce-marker'), 750);
+                    }
+
+                    map.setCenter(loc);
+                    map.setZoom(15);
+                });
+
+                map.addListener("click", (e) => {
+                    const position = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                    if (!sharingMapMarker) {
+                        const pin = new google.maps.marker.PinElement({
+                            background: '#4285F4',
+                            borderColor: '#ffffff',
+                            glyphColor: '#ffffff',
+                            scale: 1.5
+                        });
+                        pin.element.classList.add('bounce-marker');
+                        sharingMapMarker = new google.maps.marker.AdvancedMarkerElement({
+                            position: position,
+                            map: map,
+                            content: pin.element
+                        });
+                        setTimeout(() => pin.element.classList.remove('bounce-marker'), 750);
+                    } else {
+                        sharingMapMarker.position = position;
+                        const pin = sharingMapMarker.content;
+                        pin.classList.add('bounce-marker');
+                        setTimeout(() => pin.classList.remove('bounce-marker'), 750);
+                    }
+
+                    new google.maps.Geocoder().geocode({ location: e.latLng }, (results, status) => {
+                        if (status === "OK" && results[0]) {
+                            document.getElementById("destinationInput").value = results[0].formatted_address;
+                        }
+                    });
+                });
+
+                if (shouldOpenModal) {
+                    document.getElementById('locationSharingModal').classList.add('active');
+                    loadEmergencyContacts();
+                }
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                showToast('Failed to initialize map', 'error');
+            }
+        }
+
+        function updateConfirmationView() {
+            const puvDetails = locationSharingData.puv_details;
+            document.getElementById('confirmPuvDetails').innerHTML = `
+                <div>Type: ${puvDetails.type}</div>
+                <div>Plate Number: ${puvDetails.plate_number}</div>
+                ${puvDetails.notes ? `<div>Notes: ${puvDetails.notes}</div>` : ''}
+            `;
+            document.getElementById('confirmContacts').innerHTML = 
+                locationSharingData.emergency_contacts.map(contact => `
+                    <div>${contact.name} (${contact.phone}) - ${contact.relationship}</div>
+                `).join('');
+            document.getElementById('confirmDestination').textContent = 
+                locationSharingData.destination.address;
+        }
+
+        async function startLocationSharing() {
+            const startBtn = document.querySelector('#locationStep4 button.bg-green-600');
+            const originalText = startBtn.innerHTML;
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Starting...';
+            startBtn.disabled = true;
+            
+            try {
+                if (!navigator.geolocation) {
+                    throw new Error('Geolocation is not supported by your browser');
+                }
+
+                const response = await fetch('/api/location-sharing/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                    },
+                    body: JSON.stringify(locationSharingData)
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to start sharing');
+                }
+
+                document.getElementById('shareLinkContainer').classList.remove('hidden');
+                document.getElementById('shareableLinkInput').value = data.shareable_link;
+                
+                setTimeout(() => {
+                    closeLocationSharing();
+                    window.location.href = `/travelling?id=${data.session_id}`;
+                }, 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error: ' + error.message, 'error');
+                startBtn.innerHTML = originalText;
+                startBtn.disabled = false;
+            }
+        }
+
+        function copyShareableLink() {
+            const input = document.getElementById('shareableLinkInput');
+            input.select();
+            document.execCommand('copy');
+            const originalValue = input.value;
+            input.value = 'Copied to clipboard!';
+            setTimeout(() => input.value = originalValue, 2000);
+        }
+
+        function resetLocationSharing() {
+            locationSharingData = {
+                puv_details: {},
+                emergency_contacts: [],
+                destination: {},
+                session_id: null
+            };
+            currentLocationStep = 1;
+            document.getElementById('puvType').value = '';
+            document.getElementById('plateNumber').value = '';
+            document.getElementById('puvNotes').value = '';
+            document.getElementById('destinationInput').value = '';
+            if (sharingMapMarker) {
+                sharingMapMarker.setMap(null);
+                sharingMapMarker = null;
+            }
         }
 
         function loadEmergencyContacts() {
@@ -673,14 +782,10 @@
             const loading = document.getElementById('contactsLoading');
             const emptyState = document.getElementById('noContactsMessage');
             const nextBtn = document.getElementById('nextStepBtn');
-            
-            // Reset UI
             container.innerHTML = '';
             container.classList.add('hidden');
             emptyState.classList.add('hidden');
             loading.classList.remove('hidden');
-            nextBtn.disabled = true;
-            
             fetch('/api/emergency-contacts', {
                 credentials: 'include'
             })
@@ -690,12 +795,10 @@
             })
             .then(contacts => {
                 loading.classList.add('hidden');
-                
                 if (contacts.length === 0) {
                     emptyState.classList.remove('hidden');
                     return;
                 }
-                
                 container.innerHTML = contacts.map(contact => `
                     <div class="flex items-start p-3 border rounded-lg hover:bg-gray-50 transition-colors">
                         <input type="checkbox" id="contact-${contact.id}" 
@@ -718,7 +821,6 @@
                         </div>
                     </div>
                 `).join('');
-                
                 container.classList.remove('hidden');
             })
             .catch(error => {
@@ -742,17 +844,12 @@
                 document.querySelectorAll('#emergencyContactsList input[type="checkbox"]:checked')
             );
             const nextBtn = document.getElementById('nextStepBtn');
-            
-            // Enable next button if 1-2 contacts are selected
             nextBtn.disabled = selectedContacts.length === 0 || selectedContacts.length > 2;
-            
-            // Show warning if more than 2 selected
             if (selectedContacts.length > 2) {
                 showToast('You can select maximum 2 contacts', 'warning');
             }
         }
 
-        // Add this helper function for toast messages
         function showToast(message, type = 'info') {
             const colors = {
                 info: 'bg-blue-100 text-blue-800',
@@ -760,363 +857,14 @@
                 warning: 'bg-yellow-100 text-yellow-800',
                 error: 'bg-red-100 text-red-800'
             };
-            
             const toast = document.createElement('div');
             toast.className = `fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-md ${colors[type]} text-sm font-medium`;
             toast.textContent = message;
             document.body.appendChild(toast);
-            
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
-        }
-
-        let map, directionsService, directionsRenderer;
-        let autocomplete;
-        let marker;
-        let sharingMapMarker;
-        let travelingMapMarker;
-
-        function initMap(shouldOpenModal = true) {
-            if (typeof google === 'undefined' || !google.maps) {
-                showToast('Google Maps failed to load. Please refresh the page.', 'error');
-                return;
-            }
-
-            map = new google.maps.Map(document.getElementById('mapContainer'), {
-                center: { lat: 14.5995, lng: 120.9842 },
-                zoom: 13,
-                mapTypeControl: false,
-                streetViewControl: false,
-                gestureHandling: 'greedy'
-            });
-
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer();
-            directionsRenderer.setMap(map);
-
-            autocomplete = new google.maps.places.Autocomplete(
-                document.getElementById('destinationInput'),
-                {
-                    types: ['geocode'],
-                    componentRestrictions: { country: 'ph' }
-                }
-            );
-
-            map.addListener('click', (e) => {
-                if (!sharingMapMarker) {
-                    sharingMapMarker = new google.maps.Marker({
-                        position: e.latLng,
-                        map: map,
-                        draggable: true,
-                        animation: google.maps.Animation.DROP
-                    });
-                    
-                    sharingMapMarker.addListener('click', () => {
-                        sharingMapMarker.setAnimation(google.maps.Animation.BOUNCE);
-                        setTimeout(() => sharingMapMarker.setAnimation(null), 750);
-                    });
-                } else {
-                    sharingMapMarker.setPosition(e.latLng);
-                    sharingMapMarker.setAnimation(google.maps.Animation.BOUNCE);
-                    setTimeout(() => sharingMapMarker.setAnimation(null), 750);
-                }
-
-                new google.maps.Geocoder().geocode({ location: e.latLng }, (results, status) => {
-                    if (status === 'OK' && results[0]) {
-                        document.getElementById('destinationInput').value = results[0].formatted_address;
-                        locationSharingData.destination = {
-                            address: results[0].formatted_address,
-                            coordinates: {
-                                lat: e.latLng.lat(),
-                                lng: e.latLng.lng()
-                            }
-                        };
-                    }
-                });
-            });
-
-            autocomplete.addListener('place_changed', () => {
-                const place = autocomplete.getPlace();
-                if (!place.geometry) return;
-
-                locationSharingData.destination = {
-                    address: place.formatted_address,
-                    coordinates: {
-                        lat: place.geometry.location.lat(),
-                        lng: place.geometry.location.lng()
-                    }
-                };
-
-                map.setCenter(place.geometry.location);
-                
-                if (sharingMapMarker) {
-                    sharingMapMarker.setPosition(place.geometry.location);
-                    sharingMapMarker.setAnimation(google.maps.Animation.BOUNCE);
-                    setTimeout(() => sharingMapMarker.setAnimation(null), 750);
-                } else {
-                    sharingMapMarker = new google.maps.Marker({
-                        map: map,
-                        position: place.geometry.location,
-                        title: place.name,
-                        animation: google.maps.Animation.DROP
-                    });
-                }
-
-                map.setZoom(15);
-            });
-
-            const travelingMapEl = document.getElementById('travelingMap');
-            if (travelingMapEl) {
-                const travelingMap = new google.maps.Map(travelingMapEl, {
-                    center: { lat: 14.5995, lng: 120.9842 },
-                    zoom: 13,
-                    disableDefaultUI: true
-                });
-                
-                travelingMapMarker = new google.maps.Marker({
-                    map: travelingMap,
-                    icon: {
-                        url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-                    }
-                });
-            }
-
-            if (shouldOpenModal) {
-                document.getElementById('locationSharingModal').classList.add('active');
-                loadEmergencyContacts();
-            }
-        }
-
-        function clearMarker() {
-            if (sharingMapMarker) {
-                sharingMapMarker.setMap(null);
-                sharingMapMarker = null;
-            }
-            document.getElementById('destinationInput').value = '';
-            locationSharingData.destination = {};
-        }
-
-        map.setOptions({ gestureHandling: 'greedy' });
-
-
-        function updateConfirmationView() {
-            // PUV Details
-            const puvDetails = locationSharingData.puv_details;
-            document.getElementById('confirmPuvDetails').innerHTML = `
-                <div>Type: ${puvDetails.type}</div>
-                <div>Plate Number: ${puvDetails.plate_number}</div>
-                ${puvDetails.notes ? `<div>Notes: ${puvDetails.notes}</div>` : ''}
-            `;
-            
-            // Emergency Contacts
-            document.getElementById('confirmContacts').innerHTML = 
-                locationSharingData.emergency_contacts.map(contact => `
-                    <div>${contact.name} (${contact.phone})</div>
-                `).join('');
-            
-            // Destination
-            document.getElementById('confirmDestination').textContent = 
-                locationSharingData.destination.address;
-        }
-
-        function startLocationTracking() {
-            if (!('geolocation' in navigator)) {
-                alert('Geolocation is not supported by your browser');
-                return;
-            }
-            
-            // First get the current position to start the route
-            navigator.geolocation.getCurrentPosition(
-                initialPosition => {
-                    const startPos = {
-                        lat: initialPosition.coords.latitude,
-                        lng: initialPosition.coords.longitude
-                    };
-                    
-                    // Update the traveling map
-                    if (marker) {
-                        marker.setPosition(startPos);
-                        
-                        // Calculate and display route if we have a destination
-                        if (locationSharingData.destination.coordinates) {
-                            calculateAndDisplayRoute(startPos);
-                        }
-                    }
-                    
-                    // Then start watching position
-                    watchPositionId = navigator.geolocation.watchPosition(
-                        position => {
-                            const { latitude, longitude } = position.coords;
-                            const newPos = { lat: latitude, lng: longitude };
-                            
-                            // Update marker position
-                            if (marker) marker.setPosition(newPos);
-                            
-                            // Send update to server
-                            fetch('/api/location-sharing/update', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                credentials: 'include',
-                                body: JSON.stringify({
-                                    session_id: locationSharingData.session_id,
-                                    location: newPos
-                                })
-                            }).catch(error => console.error('Location update failed:', error));
-                        },
-                        error => {
-                            console.error('Geolocation error:', error);
-                        },
-                        { enableHighAccuracy: true, maximumAge: 10000 }
-                    );
-                },
-                error => {
-                    console.error('Error getting initial position:', error);
-                }
-            );
-        }
-
-        function calculateAndDisplayRoute(startPos) {
-            if (!directionsService || !directionsRenderer || !locationSharingData.destination.coordinates) return;
-            
-            directionsService.route(
-                {
-                    origin: startPos,
-                    destination: locationSharingData.destination.coordinates,
-                    travelMode: google.maps.TravelMode.DRIVING,
-                    provideRouteAlternatives: true,
-                    region: 'PH'
-                },
-                (response, status) => {
-                    if (status === 'OK') {
-                        directionsRenderer.setDirections(response);
-                        
-                        // Get the route distance and duration
-                        const route = response.routes[0];
-                        const distance = route.legs[0].distance.text;
-                        const duration = route.legs[0].duration.text;
-                        
-                        // You could display this info to the user
-                        console.log(`Route: ${distance}, ${duration}`);
-                    } else {
-                        console.error('Directions request failed:', status);
-                    }
-                }
-            );
-        }
-
-        function showTravelingPage() {
-            document.getElementById('travelingPage').classList.remove('hidden');
-            
-            // Display travel information
-            document.getElementById('travelingDestination').textContent = 
-                locationSharingData.destination.address;
-            document.getElementById('travelingVehicle').textContent = 
-                locationSharingData.puv_details.type;
-            document.getElementById('travelingPlate').textContent = 
-                locationSharingData.puv_details.plate_number;
-            
-            // Initialize the traveling map
-            if (typeof google !== 'undefined') {
-                initMap();
-            }
-        }
-
-        function handleLocationError(browserHasGeolocation, pos) {
-            const errorMsg = browserHasGeolocation ?
-                'Error: The Geolocation service failed.' :
-                'Error: Your browser doesn\'t support geolocation.';
-            
-            alert(errorMsg);
-            console.error(errorMsg, pos);
-            
-            // Fallback to a default position
-            return {
-                lat: 14.5995,
-                lng: 120.9842
-            };
-        }
-
-
-        function markArrived() {
-            // Show loading state
-            const button = document.querySelector('#travelingPage button:first-child');
-            const originalText = button.textContent;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
-            button.disabled = true;
-            
-            endLocationSharing();
-            alert('Your safe arrival has been confirmed!');
-            hideTravelingPage();
-        }
-
-        function sendSOS() {
-            if (confirm('Are you sure you want to send an SOS alert to your emergency contacts?')) {
-                // In a real app, this would trigger an API call to send emergency alerts
-                alert('SOS alert sent to your emergency contacts! Help is on the way!');
-            }
-        }
-
-        function endLocationSharing() {
-            if (watchPositionId) {
-                navigator.geolocation.clearWatch(watchPositionId);
-                watchPositionId = null;
-            }
-            
-            if (locationSharingData.session_id) {
-                fetch('/api/location-sharing/end', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        session_id: locationSharingData.session_id
-                    })
-                }).catch(error => console.error('Error ending session:', error));
-            }
-            
-            resetLocationSharing();
-        }
-
-        function hideTravelingPage() {
-            document.getElementById('travelingPage').classList.add('hidden');
-            resetLocationSharing();
-        }
-
-        function resetLocationSharing() {
-            locationSharingData = {
-                puv_details: {},
-                emergency_contacts: [],
-                destination: {},
-                session_id: null
-            };
-            currentLocationStep = 1;
-            showLocationStep(1);
-            
-            // Reset form fields
-            document.getElementById('puvType').value = '';
-            document.getElementById('plateNumber').value = '';
-            document.getElementById('puvNotes').value = '';
-            document.getElementById('destinationInput').value = '';
-        }
-
-        function showLocationStep(step) {
-            // Hide all steps first
-            document.querySelectorAll('#locationSharingModal .step').forEach(el => {
-                el.classList.toggle('hidden', !el.id.includes(`locationStep${step}`));
-            });
-            
-            // Update the active step title
-            document.querySelectorAll('.step-title').forEach(title => {
-                title.classList.toggle('hidden', !title.id.includes(`step${step}Title`));
-            });
-        }
-
-        function closeLocationSharing() {
-            if (confirm('Are you sure you want to cancel? Your progress will not be saved.')) {
-                document.getElementById('locationSharingModal').classList.remove('active');
-                resetLocationSharing();
-            }
         }
 
         function loadGoogleMaps() {
@@ -1128,8 +876,13 @@
                 return response.json();
             })
             .then(config => {
+                if (!config.mapId) {
+                    throw new Error('Map ID is required');
+                }
+                window.MAP_CONFIG = config;
+                
                 const script = document.createElement('script');
-                script.src = `https://maps.googleapis.com/maps/api/js?key=${config.key}&libraries=${config.libraries}&callback=initMap`;
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${config.key}&libraries=places,marker&callback=initMap&loading=async&v=beta`;
                 script.async = true;
                 script.defer = true;
                 script.onerror = () => {
@@ -1143,13 +896,47 @@
             });
         }
 
-        function confirmEndLocationSharing() {
-            if (confirm('Are you sure you want to end location sharing?')) {
-                endLocationSharing();
-                hideTravelingPage();
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const timeElement = document.getElementById('current-time');
+            if(timeElement) {
+                timeElement.textContent = now.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
             }
-        }
-
+            window.closeModal = function() {
+                document.getElementById('welcomeModal')?.classList.remove('active');
+            };
+            window.openSettingsModal = function() {
+                document.getElementById('settingsModal')?.classList.add('active');
+            };
+            window.closeSettingsModal = function() {
+                document.getElementById('settingsModal')?.classList.remove('active');
+            };
+            window.openChatModal = function() {
+                document.getElementById('chatModal')?.classList.add('active');
+                document.getElementById('chatInput')?.focus();
+            };
+            window.closeChatModal = function() {
+                document.getElementById('chatModal')?.classList.remove('active');
+            };
+            const isNewUser = {{ user.is_new_user | tojson }};
+            if (isNewUser) {
+                document.getElementById('onboardingModal')?.classList.remove('hidden');
+                showStep(1);
+            } else {
+                document.getElementById('welcomeModal')?.classList.add('active');
+                setTimeout(closeModal, 4000);
+            }
+            // Chat input event listener
+            document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        });
     </script>
 </body>
 </html>

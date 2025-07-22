@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ title }} - Travel Guard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: #f3f4f6; }
+    .card-shadow { box-shadow: 0 10px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1); }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+  <div class="bg-white rounded-2xl p-8 max-w-md w-full card-shadow text-center">
+    <!-- Emoji -->
+    <div class="text-6xl mb-4">{{ emoji }}</div>
+
+    <!-- Headline -->
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ headline }}</h1>
+
+    <!-- Subtext -->
+    <p class="text-sm text-gray-600 mb-6">{{ subtext }}</p>
+
+    <!-- Optional last-location mini-map (only for SOS) -->
+    {% if title == "SOS Alert" %}
+    <div class="mb-4">
+      <a href="https://www.google.com/maps/search/?api=1&query={{ current_loc.get('lat') }},{{ current_loc.get('lng') }}"
+         target="_blank"
+         class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+        <i class="fas fa-map-marker-alt mr-2"></i>
+        View on Google Maps
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- Done button -->
+    <button onclick="window.close();" class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+      Close
+    </button>
+  </div>
+</body>
+</html>

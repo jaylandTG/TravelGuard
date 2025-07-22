@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Travel Guard - Active Trip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        html, body {
+            overscroll-behavior-y: contain;
+            height: 100%;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateX(-50%) translateY(20px);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.info { background-color: #3b82f6; }
+        .toast.success { background-color: #22c55e; }
+        .toast.warning { background-color: #f59e0b; }
+        .toast.error { background-color: #ef4444; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pulse-marker {
+            animation: pulse 2s infinite;
+        }
+
+        /* Hide elements based on view type */
+        .shared-view .owner-controls { display: none; }
+        body:not(.shared-view) #shareSection { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen">
+    <div class="container mx-auto px-4 py-4 max-w-lg h-full flex flex-col">
+        <div class="bg-white rounded-2xl p-4 sm:p-6 card-shadow flex flex-col flex-1">
+            <header class="flex justify-between items-center mb-4">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800">Active Trip</h1>
+                    <p id="tripStatus" class="text-sm font-medium text-gray-500 transition-colors">Loading status...</p>
+                </div>
+                <div class="owner-controls relative">
+                    <button id="shareBtn" class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <div id="shareTooltip" class="hidden absolute right-0 mt-2 w-64 bg-white p-3 rounded-lg shadow-lg z-10 border">
+                        <p class="text-sm text-gray-600 mb-2 font-medium">Share this trip with others:</p>
+                        <div class="flex items-center">
+                            <input id="shareLinkInput" type="text" readonly class="flex-1 p-2 border rounded-l-lg text-sm bg-gray-50">
+                            <button onclick="copyShareLink()" class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div id="map" class="mb-4 flex-grow rounded-lg bg-gray-200"></div>
+            
+            <section class="mb-4 space-y-3 overflow-y-auto" style="max-height: 25vh;">
+                <div>
+                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</h3>
+                    <p id="destinationInfo" class="text-gray-800 font-semibold">Loading...</p>
+                </div>
+                <div>
+                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Public Utility Vehicle</h3>
+                    <p id="vehicleInfo" class="text-gray-800">Loading...</p>
+                </div>
+                <div id="notesWrapper">
+                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</h3>
+                    <p id="notesInfo" class="text-gray-800">Loading...</p>
+                </div>
+                <div>
+                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Location Status</h3>
+                    <p id="locationStatus" class="text-gray-800">Waiting for location...</p>
+                </div>
+            </section>
+            
+            <footer class="owner-controls grid grid-cols-3 gap-3 pt-2 border-t border-gray-100">
+                <button id="arrivedBtn" class="py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium disabled:bg-gray-400">Arrived</button>
+                <button id="cancelBtn" class="py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:bg-gray-400">Cancel</button>
+                <button id="sosBtn" class="py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-bold disabled:bg-red-300">SOS</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION & STATE ---
+        const firebaseConfig = {{ firebase_config|tojson|safe }};
+        const urlParams = new URLSearchParams(window.location.search);
+        const isSharedView = window.location.pathname.includes('/shared/');
+        const sessionId = isSharedView ? window.location.pathname.split('/').pop() : urlParams.get('id');
+
+        const state = {
+            map: null,
+            userMarker: null,
+            destinationMarker: null,
+            tripData: null,
+            watchId: null,
+            sosZoomDone: false
+        };
+
+        const DOMElements = {
+            //body: document.body,
+            tripStatus: document.getElementById('tripStatus'),
+            shareSection: document.querySelector('.owner-controls .relative'),
+            shareBtn: document.getElementById('shareBtn'),
+            shareTooltip: document.getElementById('shareTooltip'),
+            shareLinkInput: document.getElementById('shareLinkInput'),
+            mapContainer: document.getElementById('map'),
+            destinationInfo: document.getElementById('destinationInfo'),
+            vehicleInfo: document.getElementById('vehicleInfo'),
+            locationStatus: document.getElementById('locationStatus'),
+            arrivedBtn: document.getElementById('arrivedBtn'),
+            cancelBtn: document.getElementById('cancelBtn'),
+            sosBtn: document.getElementById('sosBtn'),
+            pageTitle: document.querySelector('h1'),
+            notesSection: document.getElementById('notesWrapper'),
+            notesInfo: document.getElementById('notesInfo'),
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            DOMElements.body = document.body;  
+            if (!sessionId) {
+                showToast('Invalid trip session. Redirecting...', 'error');
+                setTimeout(() => window.location.href = '/dashboard', 2000);
+                return;
+            }
+
+            firebase.initializeApp(firebaseConfig);
+            const database = firebase.database();
+            
+            setupUI();
+            listenToTripData(database);
+            try {
+                await loadGoogleMaps();
+            } catch (error) {
+                console.error("Error initializing Google Maps:", error);
+                // Handle the error appropriately, e.g., display a message to the user
+                showToast('Failed to initialize Google Maps. Please try again.', 'error'); // Example
+            }
+        });
+
+        function setupUI() {
+            if (isSharedView) {
+                DOMElements.body.classList.add('shared-view');
+                DOMElements.pageTitle.textContent = 'Shared Trip View';
+            } else {
+                DOMElements.body.classList.add('owner-view');
+                setupActionButtons();
+                setupShareButton();
+                startLocationWatcher();
+            }
+        }
+
+        // --- FIREBASE & DATA HANDLING ---
+        function listenToTripData(database) {
+            const sessionRef = database.ref(`location_sessions/${sessionId}`);
+            sessionRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    showToast('Trip not found or has ended.', 'error');
+                    if (!isSharedView) setTimeout(() => window.location.href = '/dashboard', 3000);
+                    DOMElements.mapContainer.innerHTML = '<p class="p-4 text-center">This trip is no longer available.</p>';
+                    if (state.watchId) navigator.geolocation.clearWatch(state.watchId);
+                    return;
+                }
+                state.tripData = data;
+                renderUI();
+            }, (error) => {
+                console.error("Firebase read failed: " + error.name);
+                showToast('Could not connect to trip data.', 'error');
+            });
+        }
+
+        // --- UI RENDERING ---
+        function renderUI() {
+            if (!state.tripData) return;
+            const { destination, puv_details, current_location, status, shareable_link, user_name } = state.tripData;
+            const notes = puv_details?.notes?.trim();
+
+            DOMElements.destinationInfo.textContent = destination?.address || 'N/A';
+            DOMElements.vehicleInfo.textContent = `${puv_details?.type || 'N/A'} (${puv_details?.plate_number || 'N/A'})`;
+            DOMElements.notesSection.classList.toggle('hidden', !notes);
+            DOMElements.notesInfo.textContent = notes || '';
+            if (DOMElements.shareLinkInput) DOMElements.shareLinkInput.value = shareable_link || '';
+
+            /* ----------  SOS EXTRA EMPHASIS  ---------- */
+            if (status === 'sos') {
+                DOMElements.tripStatus.textContent = `🚨 SOS Distress Call: Contact Authorities Immediately!`;
+                DOMElements.tripStatus.className = 'text-sm font-bold text-red-600 animate-pulse';
+
+                if (state.map && current_location && !state.sosZoomDone) {
+                    const loc = { lat: current_location.lat, lng: current_location.lng };
+                    state.map.setCenter(loc);
+                    state.map.setZoom(16);
+
+                    /* ----------  Static red dot in the centre ---------- */
+                    if (state.userMarker) state.userMarker.setMap(null);
+                    state.userMarker = new google.maps.Marker({
+                    position: loc,
+                    map: state.map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 4,
+                        fillColor: '#ef4444',
+                        fillOpacity: 1,
+                        strokeWeight: 0
+                    },
+                    optimized: false
+                    });
+
+                    /* ----------  Pulsing outer ring ---------- */
+                    const pulseOuter = new google.maps.Marker({
+                    position: loc,
+                    map: state.map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 20,
+                        fillColor: 'transparent',
+                        strokeColor: '#ef4444',
+                        strokeWeight: 4,
+                        strokeOpacity: 1
+                    },
+                    optimized: false
+                    });
+
+                    /* Animate the ring */
+                    let radius = 20;
+                    const pulseInterval = setInterval(() => {
+                    radius = (radius + 1) % 40 + 20;
+                    const opacity = 1 - (radius - 20) / 40;
+                    pulseOuter.setIcon({
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: radius,
+                        fillColor: 'transparent',
+                        strokeColor: '#ef4444',
+                        strokeWeight: 4,
+                        strokeOpacity: opacity
+                    });
+                    }, 70);
+
+                    state.sosZoomDone = true;
+                }
+            } else {
+                // Normal status
+                updateTripStatus(status);
+            }
+
+            if (state.map && current_location && status !== 'sos') {
+                updateMapMarkers(current_location, destination.coordinates);
+            }
+
+            const lastUpdate = new Date(current_location.timestamp);
+            DOMElements.locationStatus.textContent = `Last updated: ${lastUpdate.toLocaleTimeString()}`;
+            }
+
+
+        function updateTripStatus(status) {
+            const statusMap = {
+                'active': { text: 'In Progress', color: 'text-green-600' },
+                'completed': { text: 'Completed', color: 'text-blue-600' },
+                'cancelled': { text: 'Cancelled', color: 'text-gray-600' },
+                'sos': { text: 'SOS Activated!', color: 'text-red-600 font-bold animate-pulse' },
+            };
+            const currentStatus = statusMap[status] || statusMap['cancelled'];
+            
+            DOMElements.tripStatus.textContent = currentStatus.text;
+            DOMElements.tripStatus.className = `text-sm font-medium transition-colors ${currentStatus.color}`;
+
+            const isTripOngoing = (status === 'active' || status === 'sos');
+            if (!isSharedView) {
+                DOMElements.arrivedBtn.disabled = !isTripOngoing;
+                DOMElements.cancelBtn.disabled = !isTripOngoing;
+                DOMElements.sosBtn.disabled = !isTripOngoing;
+
+                if (!isTripOngoing) {
+                    if (state.watchId) navigator.geolocation.clearWatch(state.watchId);
+                    showToast(`Trip ${status}. Redirecting to dashboard...`, 'info');
+                    setTimeout(() => window.location.href = '/dashboard', 3000);
+                }
+            }
+        }
+
+        // --- GOOGLE MAPS ---
+        async function loadGoogleMaps() {
+            if (window.google && window.google.maps) {
+                initMap();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/maps-config', { credentials: 'include' });
+                if (!response.ok) {
+                    throw new Error('Failed to load map config');
+                }
+
+                const config = await response.json();
+                
+                if (!config.mapId) {
+                    throw new Error('Map ID is required');
+                }
+
+                window.MAP_CONFIG = config;
+                
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${config.key}&libraries=marker&callback=initMap&loading=async&v=beta`;
+                script.async = true;
+                script.defer = true;
+                script.onerror = () => {
+                    console.error('Error loading Google Maps script');
+                    DOMElements.mapContainer.innerHTML = '<div class="p-4 text-center">Could not load map.</div>';
+                };
+                document.head.appendChild(script);
+
+            } catch (error) {
+                console.error('Error loading Google Maps:', error);
+                DOMElements.mapContainer.innerHTML = `
+                    <div class="text-center p-4 bg-red-50 text-red-600 rounded-lg">
+                        Map loading failed: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+
+        window.initMap = function() {
+            state.map = new google.maps.Map(DOMElements.mapContainer, {
+                center: { lat: 14.5995, lng: 120.9842 },
+                zoom: 12,
+                disableDefaultUI: true,
+                zoomControl: true,
+                mapId: window.MAP_CONFIG.mapId, // Use the config value
+                styles: [
+                    {
+                        "featureType": "poi",
+                        "stylers": [{ "visibility": "off" }]
+                    }
+                ]
+            });
+            
+            if (state.tripData) renderUI();
+        };
+        
+        function updateMapMarkers(userCoords, destCoords) {
+            const userLatLng = { lat: userCoords.lat, lng: userCoords.lng };
+            const destLatLng = { lat: destCoords.lat, lng: destCoords.lng };
+
+            if (!state.userMarker) {
+                const userPin = new google.maps.marker.PinElement({
+                    background: '#10b981',
+                    borderColor: '#ffffff',
+                    glyphColor: '#ffffff',
+                    scale: 1.2
+                });
+                userPin.element.classList.add('pulse-marker');
+                
+                state.userMarker = new google.maps.marker.AdvancedMarkerElement({
+                    position: userLatLng,
+                    map: state.map,
+                    title: 'Current Location',
+                    content: userPin.element
+                });
+            } else {
+                state.userMarker.position = userLatLng;
+            }
+
+            if (!state.destinationMarker) {
+                const destinationPin = new google.maps.marker.PinElement({
+                    background: '#3b82f6',
+                    borderColor: '#ffffff',
+                    glyphColor: '#ffffff',
+                    scale: 1.2
+                });
+                
+                state.destinationMarker = new google.maps.marker.AdvancedMarkerElement({
+                    position: destLatLng,
+                    map: state.map,
+                    title: 'Destination',
+                    content: destinationPin.element
+                });
+            }
+
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend(userLatLng);
+            bounds.extend(destLatLng);
+            state.map.fitBounds(bounds, 100);
+        }
+
+        // --- USER ACTIONS & GEOLOCATION ---
+        function setupActionButtons() {
+            DOMElements.arrivedBtn.addEventListener('click', () => handleEndTrip('completed'));
+            DOMElements.cancelBtn.addEventListener('click', () => handleEndTrip('cancelled'));
+            DOMElements.sosBtn.addEventListener('click', handleSos);
+        }
+
+        function setupShareButton() {
+            DOMElements.shareBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                DOMElements.shareTooltip.classList.toggle('hidden');
+            });
+            document.addEventListener('click', (e) => {
+                if (!DOMElements.shareSection.contains(e.target)) {
+                    DOMElements.shareTooltip.classList.add('hidden');
+                }
+            });
+        }
+
+        function copyShareLink() {
+            DOMElements.shareLinkInput.select();
+            document.execCommand('copy');
+            showToast('Link copied to clipboard!', 'success');
+            DOMElements.shareTooltip.classList.add('hidden');
+        }
+
+        async function handleEndTrip(status) {
+            if (!confirm(`Are you sure you want to mark this trip as ${status}?`)) return;
+            try {
+                await fetchWithAuth('/api/location-sharing/end', {
+                    method: 'POST',
+                    body: JSON.stringify({ session_id: sessionId, status: status })
+                });
+                showToast(`Trip successfully marked as ${status}.`, 'success');
+            } catch (error) {
+                showToast(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleSos() {
+            if (!confirm('This will send an EMERGENCY alert to your contacts. Are you sure?')) return;
+            try {
+                const response = await fetchWithAuth('/api/location-sharing/sos', {
+                    method: 'POST',
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+                showToast(response.message || 'SOS alert sent!', 'success');
+            } catch (error) {
+                showToast(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function startLocationWatcher() {
+            if (!('geolocation' in navigator)) {
+                showToast('Geolocation is not supported.', 'error');
+                return;
+            }
+            state.watchId = navigator.geolocation.watchPosition(
+                (pos) => handleLocationUpdate(pos.coords),
+                handleLocationError,
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        function handleLocationUpdate(coords) {
+            fetchWithAuth('/api/location-sharing/update', {
+                method: 'POST',
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    location: { lat: coords.latitude, lng: coords.longitude }
+                })
+            }).catch(err => console.error("Failed to update location:", err.message));
+        }
+
+        function handleLocationError(error) {
+            showToast(`Geolocation Error: ${error.message}`, 'warning');
+        }
+
+        // --- UTILITIES ---
+        async function fetchWithAuth(url, options = {}) {
+            const mergedOptions = {
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Sends HttpOnly cookies
+                ...options,
+            };
+            const response = await fetch(url, mergedOptions);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'An unknown error occurred.');
+            return data;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            DOMElements.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

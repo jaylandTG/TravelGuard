@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trip Unavailable - Travel Guard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background:#f3f4f6; font-family: 'Poppins', sans-serif; }
+    .card-shadow { box-shadow: 0 10px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1); }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+  <div class="bg-white rounded-2xl p-8 max-w-sm w-full card-shadow text-center">
+    <i class="fas fa-clock text-5xl text-gray-400 mb-4"></i>
+    <h1 class="text-xl font-bold text-gray-800 mb-2">Trip Unavailable</h1>
+    <p class="text-sm text-gray-600 mb-6">{{ message or "This trip has already ended or the link is invalid." }}</p>
+    <button onclick="window.location.href='/'" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+      Back to Home
+    </button>
+  </div>
+</body>
+</html>

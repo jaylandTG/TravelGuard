@@ -178,6 +178,56 @@ body {
     overflow: hidden;
 }
 
+/* Shareable Link Input Styles */
+#shareableLinkInput {
+    font-size: 0.875rem;
+    height: 2.5rem;
+    cursor: text;
+}
+
+#shareableLinkInput:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+/* Modal transition effects */
+.modal-overlay {
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-overlay:not(.active) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-overlay:not(.active) .modal-content {
+    transform: translateY(20px);
+}
+
+/* MAPS MARKER ANIMATION */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.bounce-marker {
+    animation: bounce 1s infinite;
+}
+
 
 @media (max-width: 640px) {
     .modal-content {
