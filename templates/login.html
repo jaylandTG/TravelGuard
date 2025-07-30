@@ -196,49 +196,39 @@
         firebase.initializeApp(firebaseConfig);
         
         // Google login functionality
-        document.getElementById('googleLoginBtn').addEventListener('click', async function() {
-            const btn = this;
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('googleLoginBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-    
+
             try {
+                // 1️⃣  Use the modern v9 syntax
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await firebase.auth().signInWithPopup(provider);
                 const idToken = await result.user.getIdToken();
-    
-                const response = await fetch('/api/auth/google', {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id_token: idToken})
+
+                // 2️⃣  Send token to Flask backend
+                const res = await fetch('/api/auth/google', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_token: idToken })
                 });
-    
-                const data = await response.json();
-    
-                if (response.ok) {
-                    // Store JWT token in localStorage for API calls
-                    localStorage.setItem('jwt_token', data.token);
-                    
-                    // Redirect based on user status
-                    if (data.is_new_user) {
-                        window.location.href = '/dashboard';
-                    } else {
-                        window.location.href = '/dashboard';
-                    }
-                } else {
-                    throw new Error(data.error || 'Login failed');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Login failed: ' + error.message);
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Login failed');
+
+                // 3️⃣  Redirect inside the PWA
+                window.location.replace('/dashboard');
+            } catch (err) {
+                console.error(err);
+                alert('Login failed: ' + err.message);
                 firebase.auth().signOut();
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<img src="static/google.svg" alt="Google logo" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3"><span class="text-sm sm:text-base">Continue with Google</span>';
+                btn.innerHTML = '<img src="static/google.svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3"><span class="text-sm sm:text-base">Continue with Google</span>';
             }
-        });
+            });
 
         /* 1️⃣  Register service worker */
         if ('serviceWorker' in navigator) {
@@ -301,15 +291,14 @@
         dots.forEach((d, i) => d.addEventListener('click', () => { slide = i; move(); }));
 
         const isStandalone =
-        // iOS Safari
-        window.navigator.standalone ||
-        // Android Chrome / Edge / Samsung
-        (window.matchMedia &&
-        window.matchMedia('(display-mode: standalone)').matches);
+        window.navigator.standalone || // iOS
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches); // Android
 
-        if (isStandalone) {
-        document.getElementById('installBtn').classList.add('hidden');
-        }
+        const isAndroid = /android/i.test(navigator.userAgent);
+
+        if (isStandalone && isAndroid) {
+        document.getElementById('androidBtn').style.display = 'none';
+}
     </script>
 </body>
 </html>
