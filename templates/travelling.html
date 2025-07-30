@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icon-192.png">
     <title>Travel Guard - Active Trip</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -39,8 +40,8 @@
         .toast.error { background-color: #ef4444; }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 0.6; }
             100% { transform: scale(1); opacity: 1; }
         }
 
@@ -79,22 +80,22 @@
             
             <div id="map" class="mb-4 flex-grow rounded-lg bg-gray-200"></div>
             
-            <section class="mb-4 space-y-3 overflow-y-auto" style="max-height: 25vh;">
+            <section class="mb-3 space-y-2 overflow-y-auto" style="max-height: 20vh;">
                 <div>
-                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</h3>
-                    <p id="destinationInfo" class="text-gray-800 font-semibold">Loading...</p>
+                    <h3 class="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Destination</h3>
+                    <p id="destinationInfo" class="text-gray-800 font-medium text-sm">Loading...</p>
                 </div>
                 <div>
-                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Public Utility Vehicle</h3>
-                    <p id="vehicleInfo" class="text-gray-800">Loading...</p>
+                    <h3 class="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Public Utility Vehicle</h3>
+                    <p id="vehicleInfo" class="text-gray-800 text-sm">Loading...</p>
                 </div>
                 <div id="notesWrapper">
-                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</h3>
-                    <p id="notesInfo" class="text-gray-800">Loading...</p>
+                    <h3 class="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Notes</h3>
+                    <p id="notesInfo" class="text-gray-800 text-sm">Loading...</p>
                 </div>
                 <div>
-                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Location Status</h3>
-                    <p id="locationStatus" class="text-gray-800">Waiting for location...</p>
+                    <h3 class="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Location Status</h3>
+                    <p id="locationStatus" class="text-gray-800 text-sm">Waiting for location...</p>
                 </div>
             </section>
             
@@ -168,6 +169,7 @@
             if (isSharedView) {
                 DOMElements.body.classList.add('shared-view');
                 DOMElements.pageTitle.textContent = 'Shared Trip View';
+                document.title = 'Travel Guard - Shared Trip';
             } else {
                 DOMElements.body.classList.add('owner-view');
                 setupActionButtons();
@@ -374,7 +376,7 @@
                     background: '#10b981',
                     borderColor: '#ffffff',
                     glyphColor: '#ffffff',
-                    scale: 1.2
+                    scale: 1.0
                 });
                 userPin.element.classList.add('pulse-marker');
                 
@@ -393,7 +395,7 @@
                     background: '#3b82f6',
                     borderColor: '#ffffff',
                     glyphColor: '#ffffff',
-                    scale: 1.2
+                    scale: 1.0
                 });
                 
                 state.destinationMarker = new google.maps.marker.AdvancedMarkerElement({

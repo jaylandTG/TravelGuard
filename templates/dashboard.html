@@ -3,358 +3,741 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icon-192.png">
     <title>Travel Guard - Dashboard</title>
-    <!-- Preload critical resources -->
-    <link rel="preload" href="https://cdn.tailwindcss.com " as="script">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" as="style">
-    <!-- CSS -->
-    <link href=" https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href=" https://cdn.jsdelivr.net/npm/ @tailwindcss/typography@0.5.9/dist/typography.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css ">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.9/dist/typography.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="static/dashboard.css">
 </head>
-<body class="flex items-center justify-center min-h-screen p-2 bg-gray-100">
-    <div class="max-w-md mx-auto">
-        <!-- Welcome Modal -->
-        <div id="welcomeModal" class="modal-overlay">
-            <div class="modal-content card-shadow">
-                <div class="flex justify-center mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+<body class="min-h-screen bg-gray-50">
+    <div id="welcomeModal" class="modal-overlay">
+        <div class="modal-content bg-white rounded-xl p-6 text-center w-full max-w-md md:max-w-lg">
+            <div class="flex justify-center mb-4">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                     </svg>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">
-                    Welcome, <span id="userName">
-                    {% if user is string %}
-                        {{ user }}
-                    {% else %}
-                        {{ user.email.split('@')[0] }}
-                    {% endif %}
-                    </span>!
-                </h2>
-                <p class="text-gray-600 mb-6">You've successfully logged in to Travel Guard</p>
-                <button id="closeModal" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Continue to Dashboard
-                </button>
             </div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-1">
+                Welcome, <span id="userName">
+                {% if user is string %}
+                    {{ user }}
+                {% else %}
+                    {{ user.email.split('@')[0] }}
+                {% endif %}
+                </span>!
+            </h2>
+            <p class="text-sm text-gray-500 mb-4">You've successfully logged in to Travel Guard</p>
+            <button id="closeModal" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                Continue
+            </button>
         </div>
-        <!-- Onboarding Modal -->
-        <div id="onboardingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div class="bg-white rounded-xl p-6 w-full max-w-md">
-                <!-- Step 1: Welcome Message -->
-                <div id="step1" class="step">
-                    <h3 class="text-2xl font-bold mb-4 text-center">👋 Welcome to TravelGuard!</h3>
-                    <p class="text-gray-600 mb-6 text-center">
-                        TravelGuard is your personal safety companion. From sharing your location to managing your emergency contacts, we ensure you're always connected and secure wherever you go.
+    </div>
+
+    <div id="onboardingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md md:max-w-lg">
+            <div id="step1" class="step">
+                <div class="text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">👋</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Welcome to TravelGuard!</h3>
+                    <p class="text-gray-600 text-sm mb-6">
+                        TravelGuard is your personal safety companion. We ensure you're always connected and secure wherever you go.
                     </p>
-                    <button onclick="nextStep()" class="w-full bg-blue-600 text-white py-2 rounded-lg">
+                    <button onclick="nextStep()" class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm">
                         Get Started
                     </button>
                 </div>
-                <!-- Step 2: Phone Verification -->
-                <div id="step2" class="hidden step">
-                    <h3 class="text-xl font-bold mb-4">📱 Add Your Phone Number</h3>
-                    <p class="text-gray-600 text-sm mb-3">Please enter your phone number. You can update this later in settings.</p>
-                    <input type="tel" id="phoneInput" placeholder="+63 912 345 6789" class="w-full p-3 border rounded-lg mb-4">
-                    <div class="flex gap-2">
-                        <button onclick="prevStep()" class="flex-1 bg-gray-200 py-2 rounded-lg">Back</button>
-                        <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Continue</button>
+            </div>
+            <div id="step2" class="hidden step">
+                <h3 class="text-lg font-bold mb-3">📱 Add Your Phone Number</h3>
+                <p class="text-gray-600 text-xs mb-4">Please enter your phone number. You can update this later in settings.</p>
+                <input type="tel" id="phoneInput" placeholder="+63 912 345 6789" class="w-full p-3 border rounded-lg mb-4 text-sm">
+                <div class="flex gap-2">
+                    <button onclick="prevStep()" class="flex-1 bg-gray-100 py-2 rounded-lg text-sm">Back</button>
+                    <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm">Continue</button>
+                </div>
+            </div>
+            <div id="step3" class="hidden step">
+                <h3 class="text-lg font-bold mb-3">🆘 Add Emergency Contact</h3>
+                <div class="space-y-3 mb-4">
+                    <input type="text" id="contactName" placeholder="Full Name" class="w-full p-2 border rounded text-sm">
+                    <input type="tel" id="contactPhone" placeholder="Phone Number" class="w-full p-2 border rounded text-sm">
+                    <select id="contactRelation" class="w-full p-2 border rounded text-sm">
+                        <option value="family">Family</option>
+                        <option value="friend">Friend</option>
+                        <option value="colleague">Colleague</option>
+                        <option value="colleague">Spouse</option>
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="prevStep()" class="flex-1 bg-gray-100 py-2 rounded-lg text-sm">Back</button>
+                    <button onclick="completeOnboarding()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm">Finish</button>
+                </div>
+            </div>
+            <div id="step4" class="hidden step text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl">✅</span>
+                </div>
+                <h3 class="text-lg font-bold mb-2 text-green-600">Setup Complete!</h3>
+                <p class="text-gray-600 text-sm mb-4">Thank you for setting up your profile.</p>
+                <button onclick="closeOnboardingModal()" class="w-full bg-green-600 text-white py-2 rounded-lg text-sm">Continue</button>
+            </div>
+            <div id="stepError" class="hidden step text-center">
+                <span class="text-2xl">❌</span>
+                <h3 class="text-lg font-bold mb-2 text-red-600">Something went wrong</h3>
+                <p class="text-gray-600 text-sm mb-4">We couldn't save your profile. Please try again later.</p>
+                <button onclick="closeOnboardingModal()" class="w-full bg-red-600 text-white py-2 rounded-lg text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="chatModal" class="modal-overlay">
+        <div class="modal-content bg-white rounded-xl p-4 w-full max-w-md md:max-w-lg">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b">
+                <h3 class="text-base font-semibold text-gray-800">VoyagerAI: Travel Companion</h3>
+                <button onclick="closeChatModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="chatMessages" class="h-96 overflow-y-auto mb-3 space-y-3 px-1">
+                <div class="flex flex-col items-start">
+                    <div class="bg-blue-50 p-3 rounded-xl rounded-tl-none max-w-[85%]">
+                        <p class="text-sm text-blue-800 mb-1">Hi <span class="font-medium">{{ user.email.split('@')[0] }}</span>! I am Voyager AI your travel companion!</p>
+                        <p class="text-xs text-gray-600 mb-2">I can help with:</p>
+                        <ul class="list-disc list-inside text-xs space-y-1 text-gray-600 pl-2">
+                            <li>Nearest Emergency Contact?</li>
+                            <li>Is there nearby traffic?</li>
+                            <li>Is it safe to travel there in the current weather condition?</li>
+                        </ul>
+                    </div>
+                    <span class="text-xs text-gray-400 mt-1 ml-2">Today at <span id="current-time"></span></span>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <input id="chatInput" type="text" placeholder="Type your message..." class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm">
+                <button onclick="sendChatMessage()" class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-content bg-white rounded-xl p-4 w-full max-w-md md:max-w-lg">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">Settings</h3>
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <button onclick="openEditProfileForm()" 
+                    class="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                    <i class="fas fa-user-circle text-gray-500 mr-3 w-5"></i>
+                    <span>Edit Profile</span>
+                </button>
+
+                <div id="editProfileForm" class="hidden space-y-4 mt-4 pt-4 border-t">
+                    <h4 class="font-medium text-gray-800">Edit Profile</h4>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input id="editName" type="text" 
+                            class="w-full p-2 border rounded-lg text-sm"
+                            placeholder="Enter your full name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input id="editPhone" type="tel" 
+                            class="w-full p-2 border rounded-lg text-sm"
+                            placeholder="+63 9xx xxx xxxx">
+                    </div>
+                    
+                    <div class="flex justify-between pt-2">
+                        <button onclick="closeEditProfileForm()" 
+                                class="px-3 py-1.5 bg-gray-100 rounded text-sm">Cancel</button>
+                        <button onclick="saveProfileChanges()" 
+                                class="px-3 py-1.5 bg-blue-600 text-white rounded text-sm">
+                            Save Changes
+                        </button>
                     </div>
                 </div>
-                <!-- Step 3: Emergency Contact -->
-                <div id="step3" class="hidden step">
-                    <h3 class="text-xl font-bold mb-4">🆘 Add Emergency Contact</h3>
-                    <div class="space-y-3">
-                        <input type="text" id="contactName" placeholder="Full Name" class="w-full p-2 border rounded">
-                        <input type="tel" id="contactPhone" placeholder="Phone Number" class="w-full p-2 border rounded">
-                        <select id="contactRelation" class="w-full p-2 border rounded">
+                <button onclick="window.location.href='/logout'" class="w-full flex items-center p-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors mt-2 text-sm">
+                    <i class="fas fa-sign-out-alt mr-3 w-5"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="locationSharingModal" class="modal-overlay">
+        <div class="modal-content bg-white rounded-xl overflow-hidden w-full max-w-md md:max-w-lg">
+            <div id="locationStep1" class="step p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Vehicle Information</h3>
+                    <button onclick="closeLocationSharing()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
+                        <select id="puvType" class="w-full p-2 border rounded text-sm">
+                            <option value="">Select vehicle type</option>
+                            <option value="bus">Bus</option>
+                            <option value="jeepney">Jeepney</option>
+                            <option value="tricycle">Tricycle</option>
+                            <option value="taxi">Taxi</option>
+                            <option value="van">Van</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Plate Number</label>
+                        <input id="plateNumber" type="text" placeholder="ABC 1234" class="w-full p-2 border rounded text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+                        <textarea id="puvNotes" placeholder="Transport Group, Color, distinctive features, etc." class="w-full p-2 border rounded text-sm" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">Next</button>
+                </div>
+            </div>
+            <div id="locationStep2" class="hidden step p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Emergency Contacts</h3>
+                    <button onclick="closeLocationSharing()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-600 mb-4">Select 1-2 emergency contacts to notify</p>
+                <div id="emergencyContactsListShare" class="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                    <div class="text-center py-4" id="contactsLoadingShare">
+                        <div class="animate-spin inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                        <p class="mt-2 text-xs text-gray-500">Loading contacts...</p>
+                    </div>
+                    <div id="noContactsMessageShare" class="hidden text-center py-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p class="mt-2 text-gray-500 text-sm">No emergency contacts found</p>
+                        <button onclick="location.href='/dashboard'" class="mt-3 text-blue-600 text-xs font-medium">
+                            Add contacts in settings
+                        </button>
+                    </div>
+                    <div id="contactsContainerShare" class="hidden space-y-3"></div>
+                </div>
+                <div class="flex justify-between">
+                    <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-100 rounded-lg text-sm">Back</button>
+                    <button id="nextStepBtnShare" onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm" disabled>Next</button>
+                </div>
+            </div>
+            <div id="locationStep3" class="hidden step p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Destination</h3>
+                    <button onclick="closeLocationSharing()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Quick Select</label>
+                    <select id="presetDestinationSelect" class="w-full p-2 border rounded text-sm mb-3" onchange="selectPresetDestination(this.value)">
+                        <option value="">Select a preset destination</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Destination Address</label>
+                    <input id="destinationInput" type="text" placeholder="Enter destination" class="w-full p-2 border rounded text-sm">
+                </div>
+                <div class="relative">
+                    <div id="mapContainer" class="h-64 bg-gray-100 rounded-lg mb-4"></div>
+                    <div class="absolute top-2 left-2 bg-white p-1 rounded shadow">
+                        <button onclick="centerMapToUser()" class="p-1 text-gray-700 hover:text-blue-600">
+                            <i class="fas fa-location-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-100 rounded text-sm">Back</button>
+                    <button onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">Next</button>
+                </div>
+            </div>
+            <div id="locationStep4" class="hidden step p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">✅ Confirm Details</h3>
+                    <button onclick="closeLocationSharing()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <h4 class="font-medium text-sm mb-2">Vehicle Information</h4>
+                    <div id="confirmPuvDetails" class="text-xs text-gray-600 space-y-1"></div>
+                    <h4 class="font-medium text-sm mt-3 mb-2">Emergency Contacts</h4>
+                    <div id="confirmContacts" class="text-xs text-gray-600 space-y-1"></div>
+                    <h4 class="font-medium text-sm mt-3 mb-2">Destination</h4>
+                    <div id="confirmDestination" class="text-xs text-gray-600"></div>
+                    <div id="shareLinkContainer" class="hidden mt-4">
+                        <h4 class="font-medium text-sm mb-2">Shareable Link</h4>
+                        <div class="flex items-center">
+                            <input id="shareableLinkInput" type="text" readonly class="flex-1 p-2 border rounded-l-lg text-xs bg-white">
+                            <button onclick="copyShareableLink()" class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Share this link with others to track your trip</p>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-100 rounded text-sm">Back</button>
+                    <button onclick="startLocationSharing()" class="px-4 py-2 bg-green-600 text-white rounded text-sm">Start Traveling</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-content bg-white rounded-xl p-4 w-full max-w-md md:max-w-lg">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">Travel History</h3>
+                <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex items-center mb-4 space-x-2">
+                <button id="filterAll" onclick="filterHistory('all')" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">All Trips</button>
+                <button id="filterCompleted" onclick="filterHistory('completed')" class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">Completed</button>
+                <button id="filterCancelled" onclick="filterHistory('cancelled')" class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">Cancelled</button>
+            </div>
+            <div id="historyContent" class="max-h-[70vh] overflow-y-auto">
+                <div id="historyLoading" class="flex flex-col items-center justify-center py-8">
+                    <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                    <p class="mt-3 text-sm text-gray-500">Loading your travel history...</p>
+                </div>
+                <div id="historyEmpty" class="hidden flex-col items-center justify-center py-8 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h4 class="mt-3 text-lg font-medium text-gray-700">No trips found</h4>
+                    <p class="mt-1 text-sm text-gray-500">Your completed trips will appear here</p>
+                </div>
+                <div id="historyList" class="hidden space-y-3"></div>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button onclick="closeHistoryModal()" class="px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200 transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="emergencyContactsModal" class="modal-overlay">
+        <div class="modal-content bg-white rounded-xl p-4 w-full max-w-md md:max-w-lg">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">Emergency Contacts</h3>
+                <button onclick="closeEmergencyContactsModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <button onclick="showEmergencyContactForm()" class="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm">
+                    <i class="fas fa-plus mr-2"></i> Add New Contact
+                </button>
+            </div>
+
+            <div id="emergencyContactsLoadingModal" class="flex flex-col items-center justify-center py-8">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full"></div>
+                <p class="mt-3 text-sm text-gray-500">Loading your contacts...</p>
+            </div>
+
+            <div id="emergencyContactsEmptyModal" class="hidden flex-col items-center justify-center py-8 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <h4 class="mt-3 text-lg font-medium text-gray-700">No emergency contacts</h4>
+                <p class="mt-1 text-sm text-gray-500">Add at least one emergency contact for safety</p>
+            </div>
+
+            <div id="emergencyContactsListModal" class="hidden space-y-3 max-h-[60vh] overflow-y-auto"></div>
+
+            <div id="emergencyContactForm" class="hidden p-4 bg-gray-50 rounded-lg mt-4">
+                <h4 class="text-md font-medium text-gray-800 mb-3" id="contactFormTitle">Add New Contact</h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input id="EcontactName" type="text" placeholder="Enter Contact Name" class="w-full p-2 border rounded text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input id="EcontactPhone" type="tel" placeholder="+63 9xxx xxxx xxx" class="w-full p-2 border rounded text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Relationship</label>
+                        <select id="contactRelationship" class="w-full p-2 border rounded text-sm">
+                            <option value="">Select relationship</option>
                             <option value="family">Family</option>
                             <option value="friend">Friend</option>
                             <option value="colleague">Colleague</option>
+                            <option value="spouse">Spouse</option>
                         </select>
                     </div>
-                    <div class="flex gap-2 mt-4">
-                        <button onclick="prevStep()" class="flex-1 bg-gray-200 py-2 rounded-lg">Back</button>
-                        <button onclick="completeOnboarding()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Finish Setup</button>
-                    </div>
                 </div>
-                <!-- Step 4: Success/Error Message -->
-                <div id="step4" class="hidden step text-center">
-                    <h3 class="text-xl font-bold mb-4 text-green-600">✅ Setup Complete!</h3>
-                    <p class="text-gray-600 mb-4">Thank you for setting up your profile. You can now use all features of TravelGuard.</p>
-                    <button onclick="closeOnboardingModal()" class="w-full bg-green-600 text-white py-2 rounded-lg">Continue</button>
-                </div>
-                <div id="stepError" class="hidden step text-center">
-                    <h3 class="text-xl font-bold mb-4 text-red-600">❌ Something went wrong</h3>
-                    <p class="text-gray-600 mb-4">We couldn't save your profile. Please try again later.</p>
-                    <button onclick="closeOnboardingModal()" class="w-full bg-red-600 text-white py-2 rounded-lg">Close</button>
+                <div class="flex justify-between mt-4">
+                    <button onclick="hideEmergencyContactForm()" class="px-4 py-2 bg-gray-100 rounded text-sm">Cancel</button>
+                    <button onclick="saveEmergencyContact()" class="px-4 py-2 bg-red-600 text-white rounded text-sm" id="saveContactBtn">Save Contact</button>
                 </div>
             </div>
         </div>
-        <!-- Chat Modal -->
-        <div id="chatModal" class="modal-overlay">
-            <div class="modal-content card-shadow" style="max-width: 500px;">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-l font-bold text-gray-800">VoyagerAI: Travel Companion </h3>
-                    <button onclick="closeChatModal()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div id="chatMessages" class="h-[460px] overflow-y-auto mb-4 space-y-4 px-2">
-                    <!-- Welcome Message -->
-                    <div class="flex flex-col items-start" style="font-size: 14px;">
-                        <div class="bg-blue-100 p-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm">
-                            <p class="font-sm text-blue-800 mb-1">Hi <span class="font-semibold">{{ user.email.split('@')[0] }}</span>! I am Voyager AI your travel companion!</p>
-                            <p class="text-xs text-gray-700 mb-2">I can help with:</p>
-                            <ul class="list-disc list-inside text-sm space-y-1 text-gray-700 pl-2" style="font-size: 12px;">
-                                <li>Nearest Emergency Contact?</li>
-                                <li>Is there nearby traffic?</li>
-                                <li>Is it safe to travel there in the current weather condition?</li>
-                            </ul>
-                        </div>
-                        <span class="text-xs text-gray-500 mt-1 ml-2">Today at <span id="current-time"></span></span>
-                    </div>
-                </div>
-                <div class="flex space-x-2">
-                    <input id="chatInput" type="text" placeholder="Type your message..." 
-                           class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500" style="font-size: 12px;">
-                    <button onclick="sendChatMessage()" class="p-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                    </button>
-                </div>
+    </div>
+
+    <div id="presetsModal" class="modal-overlay">
+        <div class="modal-content bg-white rounded-xl p-4 w-full max-w-md md:max-w-lg">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">Preset Destinations</h3>
+                <button onclick="closePresetsModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </div>
-        <!-- Settings Modal -->
-        <div id="settingsModal" class="modal-overlay">
-            <div class="modal-content card-shadow">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold text-gray-800">Settings</h3>
-                    <button onclick="closeSettingsModal()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+            <div class="mb-4">
+                <button onclick="showPresetForm()" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                    <i class="fas fa-plus mr-2"></i> Add New Destination
+                </button>
+            </div>
+            <div id="presetsLoading" class="flex flex-col items-center justify-center py-8">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                <p class="mt-3 text-sm text-gray-500">Loading your destinations...</p>
+            </div>
+            <div id="presetsEmpty" class="hidden flex-col items-center justify-center py-8 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <h4 class="mt-3 text-lg font-medium text-gray-700">No preset destinations</h4>
+                <p class="mt-1 text-sm text-gray-500">Save your frequent destinations for quick access</p>
+            </div>
+            <div id="presetsList" class="hidden space-y-3 max-h-[60vh] overflow-y-auto"></div>
+            <div id="presetForm" class="hidden p-4 bg-gray-50 rounded-lg mt-4">
+                <h4 class="text-md font-medium text-gray-800 mb-3" id="formTitle">Add New Destination</h4>
                 <div class="space-y-3">
-                    <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-user-circle text-gray-600 mr-3"></i>
-                        <span>Edit Profile</span>
-                    </button>
-                    <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-bell text-gray-600 mr-3"></i>
-                        <span>Notification Settings</span>
-                    </button>
-                    <button class="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-shield-alt text-gray-600 mr-3"></i>
-                        <span>Privacy Settings</span>
-                    </button>
-                    <button onclick="window.location.href='/logout'" 
-                            class="w-full flex items-center p-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors mt-4">
-                        <i class="fas fa-sign-out-alt mr-3"></i>
-                        <span>Logout</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Location Sharing Modal -->
-        <div id="locationSharingModal" class="modal-overlay">
-            <div class="modal-content card-shadow" style="max-width: 500px;">
-                <!-- Step 1: PUV Details -->
-                <div id="locationStep1" class="step p-4">
-                    <h3 class="text-xl font-bold mb-4">🚌 Vehicle Information</h3>
-                    <button onclick="closeLocationSharing()" class="text-gray-500 hover:text-gray-700 close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">PUV Type</label>
-                            <select id="puvType" class="w-full p-2 border rounded">
-                                <option value="">Select vehicle type</option>
-                                <option value="bus">Bus</option>
-                                <option value="jeepney">Jeepney</option>
-                                <option value="tricycle">Tricycle</option>
-                                <option value="taxi">Taxi</option>
-                                <option value="van">Van</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Plate Number</label>
-                            <input id="plateNumber" type="text" placeholder="ABC 1234" class="w-full p-2 border rounded">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
-                            <textarea id="puvNotes" placeholder="Color, distinctive features, etc." class="w-full p-2 border rounded"></textarea>
-                        </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input id="presetName" type="text" placeholder="Home, Work, etc." class="w-full p-2 border rounded text-sm">
                     </div>
-                    <div class="flex justify-end mt-6">
-                        <button onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded">Next</button>
-                    </div>
-                </div>
-                <!-- Step 2: Emergency Contacts -->
-                <div id="locationStep2" class="hidden step p-4">
-                    <h3 class="text-xl font-bold mb-4">🆘 Emergency Contacts</h3>
-                    <button onclick="closeLocationSharing()" class="text-gray-500 hover:text-gray-700 close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <p class="text-sm text-gray-600 mb-4">Select 1-2 emergency contacts to notify</p>
-                    <div id="emergencyContactsList" class="space-y-3 mb-4 max-h-64 overflow-y-auto">
-                        <!-- Loading state -->
-                        <div class="text-center py-4" id="contactsLoading">
-                            <div class="animate-spin inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                            <p class="mt-2 text-sm text-gray-500">Loading contacts...</p>
-                        </div>
-                        <div id="noContactsMessage" class="hidden text-center py-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <p class="mt-2 text-gray-500">No emergency contacts found</p>
-                            <button onclick="location.href='/dashboard'" class="mt-3 text-blue-600 text-sm font-medium">
-                                Add contacts in settings
-                            </button>
-                        </div>
-                        <div id="contactsContainer" class="hidden space-y-3"></div>
-                    </div>
-                    <div class="flex justify-between mt-6">
-                        <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-200 rounded-lg">Back</button>
-                        <button id="nextStepBtn" onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded-lg" disabled>Next</button>
-                    </div>
-                </div>
-                <!-- Step 3: Destination -->
-                <div id="locationStep3" class="hidden step p-4">
-                    <h3 class="text-xl font-bold mb-4">📍 Destination</h3>
-                    <button onclick="closeLocationSharing()" class="text-gray-500 hover:text-gray-700 close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Destination Address</label>
-                        <input id="destinationInput" type="text" placeholder="Enter destination" class="w-full p-2 border rounded">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <input id="presetAddress" type="text" placeholder="Enter address" class="w-full p-2 border rounded text-sm">
                     </div>
                     <div class="relative">
-                        <div id="mapContainer" class="h-64 bg-gray-100 rounded-lg mb-4"></div>
-                    </div>
-                    <div class="flex justify-between mt-6">
-                        <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-200 rounded">Back</button>
-                        <button onclick="nextLocationStep()" class="px-4 py-2 bg-blue-600 text-white rounded">Next</button>
-                    </div>
-                </div>
-                <!-- Step 4: Confirmation -->
-                <div id="locationStep4" class="hidden step p-4">
-                    <h3 class="text-xl font-bold mb-4">✅ Confirm Details</h3>
-                    <button onclick="closeLocationSharing()" class="text-gray-500 hover:text-gray-700 close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                        <h4 class="font-medium mb-2">Vehicle Information</h4>
-                        <div id="confirmPuvDetails" class="text-sm text-gray-600 space-y-1"></div>
-                        <h4 class="font-medium mt-4 mb-2">Emergency Contacts</h4>
-                        <div id="confirmContacts" class="text-sm text-gray-600 space-y-1"></div>
-                        <h4 class="font-medium mt-4 mb-2">Destination</h4>
-                        <div id="confirmDestination" class="text-sm text-gray-600"></div>
-                        <!-- Shareable Link Section -->
-                        <div id="shareLinkContainer" class="hidden mt-4">
-                            <h4 class="font-medium mb-2">Shareable Link</h4>
-                            <div class="flex items-center">
-                                <input id="shareableLinkInput" type="text" readonly 
-                                       class="flex-1 p-2 border rounded-l-lg text-sm bg-white">
-                                <button onclick="copyShareableLink()" 
-                                        class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">Share this link with others to track your trip</p>
-                        </div>
-                    </div>
-                    <div class="flex justify-between mt-6">
-                        <button onclick="prevLocationStep()" class="px-4 py-2 bg-gray-200 rounded">Back</button>
-                        <button onclick="startLocationSharing()" class="px-4 py-2 bg-green-600 text-white rounded">
-                            Start Traveling
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Dashboard Content -->
-        <div class="w-full">
-            <div class="bg-white rounded-2xl p-8 card-shadow">
-                <!-- Travel Guard Logo -->
-                <div class="flex justify-center mb-8">
-                    <div class="text-center">
-                        <div class="flex items-center justify-center">
-                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-xl shadow-md">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
-                            </div>
-                            <span class="ml-3 text-2xl font-bold text-gray-800">Travel Guard</span>
-                        </div>
-                        <p class="text-sm text-gray-500 mt-2">Welcome back, {{ user.email }}</p>
-                    </div>
-                </div>
-                <!-- Dashboard Buttons -->
-                <div class="w-full max-w-sm">
-                    <div class="bg-white rounded-xl p-6 card-shadow space-y-4">
-                        <!-- Existing Feature Buttons -->
-                        <button onclick="openLocationSharing()" class="w-full flex flex-col items-center justify-center p-4 bg-blue-70 rounded-xl hover:bg-blue-100 transition-all active:scale-95 transform hover:scale-[1.02]">
-                            <div class="bg-blue-100 p-3 rounded-full mb-2">
-                                <i class="fas fa-location-arrow text-blue-600"></i>
-                            </div>
-                            <span class="font-medium text-gray-800">Share Live Location</span>
-                            <span class="text-xs text-gray-500 mt-1">Keep friends and family in the loop</span>
-                        </button>
-                        <button onclick="location.href='#'" class="w-full flex flex-col items-center justify-center p-4 bg-green-70 rounded-xl hover:bg-green-100 transition-all active:scale-95 transform hover:scale-[1.02]">
-                            <div class="bg-green-100 p-3 rounded-full mb-2">
-                                <i class="fas fa-bus text-green-600"></i>
-                            </div>
-                            <span class="font-medium text-gray-800">Travel History</span>
-                            <span class="text-xs text-gray-500 mt-1">Track public transport history</span>
-                        </button>
-                        <button onclick="location.href='#'" class="w-full flex flex-col items-center justify-center p-4 bg-purple-70 rounded-xl hover:bg-purple-100 transition-all active:scale-95 transform hover:scale-[1.02]">
-                            <div class="bg-purple-100 p-3 rounded-full mb-2">
-                                <i class="fas fa-map-marked-alt text-purple-600"></i>
-                            </div>
-                            <span class="font-medium text-gray-800">Preset Destinations</span>
-                            <span class="text-xs text-gray-500 mt-1">Make travel plans ahead</span>
-                        </button>                        
-                        <!-- New Row for Chat and Settings -->
-                        <div class="flex gap-3">
-                            <button onclick="openChatModal()" class="flex-1 flex flex-col items-center justify-center p-4 bg-blue-70 rounded-xl hover:bg-blue-100 transition-all active:scale-95 transform hover:scale-[1.02]">
-                                <div class="bg-blue-100 p-2 rounded-full mb-2">
-                                    <i class="fas fa-comment text-blue-600"></i>
-                                </div>
-                                <span class="font-medium text-gray-800 text-sm">VoyagerAI</span>
-                            </button>
-                            <button onclick="openSettingsModal()" class="flex-1 flex flex-col items-center justify-center p-4 bg-gray-70 rounded-xl hover:bg-gray-100 transition-all active:scale-95 transform hover:scale-[1.02]">
-                                <div class="bg-gray-100 p-2 rounded-full mb-2">
-                                    <i class="fas fa-cog text-gray-700"></i>
-                                </div>
-                                <span class="font-medium text-gray-800 text-sm">Settings</span>
+                        <div id="presetMapContainer" class="h-48 bg-gray-100 rounded-lg mb-2"></div>
+                        <div class="absolute top-2 left-2 bg-white p-1 rounded shadow">
+                            <button onclick="centerPresetMapToUser()" class="p-1 text-gray-700 hover:text-blue-600">
+                                <i class="fas fa-location-arrow"></i>
                             </button>
                         </div>
                     </div>
                 </div>
+                <div class="flex justify-between mt-4">
+                    <button onclick="hidePresetForm()" class="px-4 py-2 bg-gray-100 rounded text-sm">Cancel</button>
+                    <button onclick="savePreset()" class="px-4 py-2 bg-blue-600 text-white rounded text-sm" id="savePresetBtn">Save Destination</button>
+                </div>
             </div>
         </div>
-    <!-- Deferred Scripts -->
-    <script src="https://cdn.tailwindcss.com " defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js " defer></script>
+    </div>
 
-    <!-- Google Maps Script
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&loading=async&libraries=places,geometry,marker&callback=initMap">
-    </script> -->
+    <!-- ===== Help & Support Modal ===== -->
+    <div id="helpSupportModal" class="modal-overlay">
+    <div class="modal-content bg-white rounded-xl p-5 w-full max-w-md md:max-w-lg">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 pb-2 border-b">
+        <h3 class="text-lg font-semibold text-gray-800">Help & Support</h3>
+        <button onclick="closeHelpSupportModal()" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times"></i>
+        </button>
+        </div>
 
-    <!-- Inline Critical JS -->
+        <!-- 1. Application Guide -->
+        <button onclick="openAppGuide()" 
+                class="w-full flex items-center p-3 mb-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+        <i class="fas fa-book text-blue-600 mr-3"></i>
+        <div class="text-left">
+            <div class="font-semibold text-sm">Application Guide</div>
+            <div class="text-xs text-gray-500">Quick tour of every feature</div>
+        </div>
+        </button>
+
+        <!-- 2. Get TravelGuard Support -->
+        <button onclick="openSupportEmail()" 
+                class="w-full flex items-center p-3 mb-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
+        <i class="fas fa-envelope text-green-600 mr-3"></i>
+        <div class="text-left">
+            <div class="font-semibold text-sm">Get TravelGuard Support</div>
+            <div class="text-xs text-gray-500">Email us at travelguard.help@gmail.com</div>
+        </div>
+        </button>
+
+        <!-- 3. Tips & Tricks (swipeable) -->
+        <button onclick="openTipsTricks()" 
+                class="w-full flex items-center p-3 mb-4 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
+        <i class="fas fa-lightbulb text-purple-600 mr-3"></i>
+        <div class="text-left">
+            <div class="font-semibold text-sm">Tips & Tricks</div>
+            <div class="text-xs text-gray-500">Swipe cards for safe-travel tips</div>
+        </div>
+        </button>
+    </div>
+    </div>
+
+    <!-- ===== Application Guide Modal ===== -->
+    <div id="appGuideModal" class="modal-overlay">
+    <div class="modal-content bg-white rounded-xl p-4 w-full max-w-md md:max-w-lg">
+        <div class="flex justify-between items-center mb-3 pb-2 border-b">
+        <h3 class="text-lg font-semibold text-gray-800">Application Guide</h3>
+        <button onclick="closeAppGuide()" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times"></i>
+        </button>
+        </div>
+
+        <div class="max-h-[70vh] overflow-y-auto space-y-4 text-sm">
+        <!-- Re-use icons from dashboard -->
+        <div>
+            <i class="fas fa-location-arrow text-blue-600 mr-2"></i>
+            <strong>Share Live Location</strong>
+            <ul class="list-disc list-inside ml-5 text-xs text-gray-600 space-y-1 mt-1">
+            <li>Tap → 4-step wizard (Vehicle, Contacts, Destination, Confirm).</li>
+            <li>Emergency contacts receive SMS with live link.</li>
+            </ul>
+        </div>
+
+        <div>
+            <i class="fas fa-bus text-green-600 mr-2"></i>
+            <strong>Travel History</strong>
+            <ul class="list-disc list-inside ml-5 text-xs text-gray-600 space-y-1 mt-1">
+            <li>View past trips: Completed / Cancelled / SOS.</li>
+            <li>Filter buttons at top.</li>
+            </ul>
+        </div>
+
+        <div>
+            <i class="fas fa-map-marked-alt text-purple-600 mr-2"></i>
+            <strong>Preset Destinations</strong>
+            <ul class="list-disc list-inside ml-5 text-xs text-gray-600 space-y-1 mt-1">
+            <li>Save frequent spots for 1-tap selection.</li>
+            <li>Max 5 presets.</li>
+            </ul>
+        </div>
+
+        <div>
+            <i class="fas fa-user-friends text-red-600 mr-2"></i>
+            <strong>Emergency Contacts</strong>
+            <ul class="list-disc list-inside ml-5 text-xs text-gray-600 space-y-1 mt-1">
+            <li>Add up to 5 contacts (name, phone, relation).</li>
+            <li>Auto-notified on every shared trip.</li>
+            </ul>
+        </div>
+
+        <div>
+            <i class="fas fa-comment text-blue-600 mr-2"></i>
+            <strong>VoyagerAI Chatbot</strong>
+            <ul class="list-disc list-inside ml-5 text-xs text-gray-600 space-y-1 mt-1">
+            <li>Ask travel questions, traffic, weather, safety.</li>
+            <li>Chats are stored for later.</li>
+            </ul>
+        </div>
+
+        <div>
+            <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+            <strong>SOS Alert</strong>
+            <ul class="list-disc list-inside ml-5 text-xs text-gray-600 space-y-1 mt-1">
+            <li>Tap during any live trip → instant SMS + location.</li>
+            <li>Trip marked SOS in history.</li>
+            </ul>
+        </div>
+
+        <div>
+            <i class="fas fa-cog text-gray-600 mr-2"></i>
+            <strong>Settings & Logout</strong>
+            <ul class="list-disc list-inside ml-5 text-xs text-gray-600 space-y-1 mt-1">
+            <li>Edit phone number or log out securely.</li>
+            </ul>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- ===== Tips & Tricks Modal ===== -->
+    <div id="tipsModal" class="modal-overlay">
+    <div class="modal-content bg-white rounded-xl overflow-hidden w-full max-w-md md:max-w-lg">
+        <div class="flex justify-between items-center p-4 bg-purple-600 text-white">
+        <h3 class="text-lg font-semibold">Tips & Tricks</h3>
+        <button onclick="closeTipsTricks()" class="opacity-80 hover:opacity-100">
+            <i class="fas fa-times"></i>
+        </button>
+        </div>
+
+        <!-- Swipeable cards container -->
+        <div id="tipsCarousel" class="relative h-80 flex overflow-x-auto snap-x snap-mandatory scroll-smooth">
+        <!-- Card 1 -->
+        <div class="snap-start w-full flex-shrink-0 p-6 flex flex-col justify-center">
+            <i class="fas fa-battery-half text-purple-600 text-3xl mb-3"></i>
+            <div class="font-semibold text-base mb-1">Battery Paranoia</div>
+            <p class="text-xs text-gray-600">Before boarding, screenshot your trip details. If your phone dies, you still have proof.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="snap-start w-full flex-shrink-0 p-6 flex flex-col justify-center">
+            <i class="fas fa-share-alt text-purple-600 text-3xl mb-3"></i>
+            <div class="font-semibold text-base mb-1">Share ETA Early</div>
+            <p class="text-xs text-gray-600">Send your live link the moment you sit down—before the vehicle moves.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="snap-start w-full flex-shrink-0 p-6 flex flex-col justify-center">
+            <i class="fas fa-eye text-purple-600 text-3xl mb-3"></i>
+            <div class="font-semibold text-base mb-1">Check the Plate</div>
+            <p class="text-xs text-gray-600">Match the plate number in the app with the actual vehicle before entering.</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="snap-start w-full flex-shrink-0 p-6 flex flex-col justify-center">
+            <i class="fas fa-users text-purple-600 text-3xl mb-3"></i>
+            <div class="font-semibold text-base mb-1">Sit Smart</div>
+            <p class="text-xs text-gray-600">At night, choose seats visible to the driver or in well-lit areas.</p>
+        </div>
+        </div>
+
+        <!-- Carousel Dots -->
+        <div class="flex justify-center space-x-2 py-2">
+        <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+        <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+        <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+        <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+        </div>
+    </div>
+    </div>
+
+    <div class="relative min-h-screen flex flex-col md:flex-row md:items-start md:justify-center md:py-8 md:px-6">
+        <aside class="hidden md:block md:w-64 lg:w-80 md:flex-shrink-0 md:mr-6">
+            <div class="bg-white rounded-2xl p-6 shadow-md sticky top-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-blue-600 p-2 rounded-lg shadow">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <span class="ml-2 text-xl font-bold text-gray-800">Travel Guard</span>
+                </div>
+                <div class="bg-blue-50/70 backdrop-blur-lg rounded-xl shadow-inner p-4 text-center space-y-2 mb-6">
+                    <p class="text-xs font-medium text-blue-600 tracking-wider" id="dashboard-date"></p>
+                    <p class="text-sm text-gray-700">Welcome back, <span class="font-semibold text-gray-900">{{ user.email.split('@')[0] }}</span>!</p>
+                    <p class="text-xs text-gray-500">Let’s make today’s journey safe & smooth.</p>
+                </div>
+                <nav class="space-y-2">
+                    <button onclick="openLocationSharing()" class="w-full flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors text-left"><i class="fas fa-location-arrow text-blue-600 mr-3 w-5"></i><span class="font-medium text-gray-800 text-sm">Share Live Location</span></button>
+                    <button onclick="openHistoryModal()" class="w-full flex items-center p-3 rounded-lg hover:bg-green-50 transition-colors text-left"><i class="fas fa-bus text-green-600 mr-3 w-5"></i><span class="font-medium text-gray-800 text-sm">Travel History</span></button>
+                    <button onclick="openPresetsModal()" class="w-full flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors text-left"><i class="fas fa-map-marked-alt text-purple-600 mr-3 w-5"></i><span class="font-medium text-gray-800 text-sm">Preset Destinations</span></button>
+                    <button onclick="openEmergencyContactsModal()" class="w-full flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors text-left"><i class="fas fa-user-friends text-red-600 mr-3 w-5"></i><span class="font-medium text-gray-800 text-sm">Emergency Contacts</span></button>
+                    <button onclick="openHelpSupportModal()" class="w-full flex items-center p-3 rounded-lg hover:bg-orange-50 transition-colors text-left"><i class="fas fa-question-circle text-orange-600 mr-3 w-5"></i><span class="font-medium text-gray-800 text-sm">Help & Support</span></button>
+                </nav>
+                <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                    <button onclick="openChatModal()" class="w-full flex items-center p-3 rounded-lg hover:bg-blue-50 transition-colors text-left"><i class="fas fa-comment text-blue-600 mr-3 w-5"></i><span class="font-medium text-gray-800 text-sm">VoyagerAI</span></button>
+                    <button onclick="openSettingsModal()" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors text-left"><i class="fas fa-cog text-gray-600 mr-3 w-5"></i><span class="font-medium text-gray-800 text-sm">Settings</span></button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 w-full max-w-md mx-auto md:max-w-full md:mx-0 md:pt-0">
+            <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3 flex items-center justify-between z-20 md:hidden">
+                <div class="flex items-center">
+                    <div class="bg-blue-600 p-2 rounded-lg shadow">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <span class="ml-2 text-xl font-bold text-gray-800">Travel Guard</span>
+                </div>
+            </header>
+
+            <section class="pdt px-4 mb-3 md:hidden">
+                <div class="mx-auto max-w-sm">
+                    <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg p-5 text-center space-y-3">
+                        <p class="text-xs font-medium text-blue-600 tracking-wider" id="dashboard-date"></p>
+                        <p class="text-sm text-gray-700">Welcome back, <span class="font-semibold text-gray-900">{{ user.email.split('@')[0] }}</span>!</p>
+                        <p class="text-xs text-gray-500">Let’s make today’s journey safe & smooth.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="p-4 md:p-0">
+                <div class="bg-white rounded-2xl p-6 shadow-sm md:shadow-lg md:p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 hidden md:block">Dashboard</h2>
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <button onclick="openLocationSharing()" class="w-full flex items-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors md:flex-col md:text-center md:justify-center md:items-center md:hidden">
+                            <div class="bg-blue-100 p-3 rounded-lg mr-4 md:mr-0 md:mb-2"><i class="fas fa-location-arrow text-blue-600 text-xl md:text-2xl"></i></div>
+                            <div class="text-left md:text-center"><span class="block font-medium text-gray-800 text-base md:text-lg">Share Live Location</span><span class="block text-xs text-gray-500">Keep friends and family in the loop</span></div>
+                        </button>
+                        <button onclick="openHistoryModal()" class="w-full flex items-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors md:flex-col md:text-center md:justify-center md:items-center md:hidden">
+                            <div class="bg-green-100 p-3 rounded-lg mr-4 md:mr-0 md:mb-2"><i class="fas fa-bus text-green-600 text-xl md:text-2xl"></i></div>
+                            <div class="text-left md:text-center"><span class="block font-medium text-gray-800 text-base md:text-lg">Travel History</span><span class="block text-xs text-gray-500">Track public transport history</span></div>
+                        </button>
+                        <button onclick="openPresetsModal()" class="w-full flex items-center p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors md:flex-col md:text-center md:justify-center md:items-center md:hidden">
+                            <div class="bg-purple-100 p-3 rounded-lg mr-4 md:mr-0 md:mb-2"><i class="fas fa-map-marked-alt text-purple-600 text-xl md:text-2xl"></i></div>
+                            <div class="text-left md:text-center"><span class="block font-medium text-gray-800 text-base md:text-lg">Preset Destinations</span><span class="block text-xs text-gray-500">Make travel plans ahead</span></div>
+                        </button>
+                        <button onclick="openEmergencyContactsModal()" class="w-full flex items-center p-4 bg-red-50 rounded-xl hover:bg-red-100 transition-colors md:flex-col md:text-center md:justify-center md:items-center md:hidden">
+                            <div class="bg-red-100 p-3 rounded-lg mr-4 md:mr-0 md:mb-2"><i class="fas fa-user-friends text-red-600 text-xl md:text-2xl"></i></div>
+                            <div class="text-left md:text-center"><span class="block font-medium text-gray-800 text-base md:text-lg">Emergency Contacts</span><span class="block text-xs text-gray-500">Modify emergency contacts</span></div>
+                        </button>
+                        <button onclick="openHelpSupportModal()" class="w-full flex items-center p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors md:flex-col md:text-center md:justify-center md:items-center md:hidden">
+                            <div class="bg-orange-100 p-3 rounded-lg mr-4 md:mr-0 md:mb-2"><i class="fas fa-question-circle text-orange-600 text-xl md:text-2xl"></i></div>
+                            <div class="text-left md:text-center"><span class="block font-medium text-gray-800 text-base md:text-lg">Help & Support</span><span class="block text-xs text-gray-500">Access tutorials, FAQs, and contact support</span></div>
+                        </button>
+                        <div class="grid grid-cols-2 gap-3 md:hidden">
+                            <button onclick="openChatModal()" class="w-full flex items-center p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"><div class="bg-blue-100 p-2 rounded-lg mr-3"><i class="fas fa-comment text-blue-600"></i></div><span class="font-medium text-gray-800 text-sm">VoyagerAI</span></button>
+                            <button onclick="openSettingsModal()" class="w-full flex items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"><div class="bg-gray-100 p-2 rounded-lg mr-3"><i class="fas fa-cog text-gray-600"></i></div><span class="font-medium text-gray-800 text-sm">Settings</span></button>
+                        </div>
+                        <div class="hidden md:block w-full bg-white rounded-2xl p-6 shadow-md md:col-span-2 lg:col-span-1">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Stats</h3>
+                            <div class="flex items-center justify-between py-2 border-b border-gray-100"><span class="text-sm text-gray-600">Total Trips:</span><span class="font-bold text-gray-800">12</span></div>
+                            <div class="flex items-center justify-between py-2"><span class="text-sm text-gray-600">Active Shares:</span><span class="font-bold text-green-600">1</span></div>
+                        </div>
+                        <div class="hidden md:block w-full bg-white rounded-2xl p-6 shadow-md md:col-span-2 lg:col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Latest Activity</h3>
+                            <ul class="space-y-3 text-sm text-gray-700">
+                                <li class="flex items-center"><i class="fas fa-map-marker-alt text-blue-500 mr-3"></i><span>Location shared to Mom at 10:30 AM</span></li>
+                                <li class="flex items-center"><i class="fas fa-bus text-green-500 mr-3"></i><span>Trip to Market completed at 09:00 AM</span></li>
+                                <li class="flex items-center"><i class="fas fa-user-friends text-red-500 mr-3"></i><span>Emergency contact "Dad" added</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    
+
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const now = new Date();
             const timeElement = document.getElementById('current-time');
             if(timeElement) {
-                timeElement.textContent = now.toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
+                timeElement.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
-            // Basic modal handlers
+            document.getElementById('closeModal')?.addEventListener('click', closeModal);
             window.closeModal = function() {
                 document.getElementById('welcomeModal')?.classList.remove('active');
             };
@@ -371,7 +754,6 @@
             window.closeChatModal = function() {
                 document.getElementById('chatModal')?.classList.remove('active');
             };
-            // Check for new user
             const isNewUser = {{ user.is_new_user | tojson }};
             if (isNewUser) {
                 document.getElementById('onboardingModal')?.classList.remove('hidden');
@@ -380,82 +762,23 @@
                 document.getElementById('welcomeModal')?.classList.add('active');
                 setTimeout(closeModal, 4000);
             }
-        });
-    </script>
-
-    <!-- Main JS (deferred) -->
-    <script defer>
-        // Chat functionality
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (!message) return;
-            const chatContainer = document.getElementById('chatMessages');
-            if (!chatContainer) return;
-            // Add user message
-            chatContainer.insertAdjacentHTML('beforeend', `
-                <div class="flex justify-end mb-2">
-                    <div class="bg-gray-300 p-3 rounded-lg max-w-[80%]">
-                        <p class="text-xs">${message}</p>
-                    </div>
-                </div>
-            `);
-            input.value = '';
-            // Add typing indicator
-            chatContainer.insertAdjacentHTML('beforeend', `
-                <div id="typing-indicator" class="flex mb-2">
-                    <div class="bg-blue-200 p-3 rounded-lg max-w-[80%]">
-                        <div class="flex space-x-1">
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-                        </div>
-                    </div>
-                </div>
-            `);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('typing-indicator')?.remove();
-                if (data.response) {
-                    chatContainer.insertAdjacentHTML('beforeend', `
-                        <div class="flex mb-2">
-                            <div class="text-xs bg-blue-200 p-3 rounded-lg max-w-[80%] prose prose-xs prose-blue">
-                                ${marked.parse(data.response)}
-                            </div>
-                        </div>
-                    `);
-                } else if (data.error) {
-                    chatContainer.insertAdjacentHTML('beforeend', `
-                        <div class="flex mb-2">
-                            <div class="bg-red-200 p-3 rounded-lg max-w-[80%]">
-                                <p class="text-xs">Error: ${data.error}</p>
-                            </div>
-                        </div>
-                    `);
+            document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
                 }
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            })
-            .catch(error => {
-                document.getElementById('typing-indicator')?.remove();
-                chatContainer.insertAdjacentHTML('beforeend', `
-                    <div class="flex mb-2">
-                        <div class="bg-red-100 p-3 rounded-lg max-w-[80%]">
-                            <p class="text-sm">Error: ${error.message}</p>
-                        </div>
-                    </div>
-                `);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
             });
-        }
 
-        // Onboarding flow
+            function setDashboardDate() {
+                const now = new Date();
+                const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+                const dateStr = now.toLocaleDateString('en-US', options);
+                console.log(dateStr)
+                document.querySelectorAll('#dashboard-date').forEach(el => el.textContent = dateStr);
+            }
+            setDashboardDate();
+        
+        });
+
         let currentStep = 1;
         function showStep(stepNumber) {
             document.querySelectorAll('.step').forEach(step => {
@@ -495,7 +818,6 @@
             .catch(() => showStep('Error'));
         }
 
-        // Location Sharing Flow
         let locationSharingData = {
             puv_details: {},
             emergency_contacts: [],
@@ -507,18 +829,46 @@
         let map, directionsService, directionsRenderer;
         let autocomplete;
         let sharingMapMarker;
+        let userLocationMarker;
+        let cachedPresets = null;
 
-        function openLocationSharing() {
+        function loadGoogleMaps() {
+            return new Promise((resolve, reject) => {
+                if (window.google && window.google.maps) {
+                    resolve();
+                    return;
+                }
+                fetch('/api/maps-config', { credentials: 'include' })
+                    .then(r => r.json())
+                    .then(config => {
+                        window.MAP_CONFIG = config;
+                        const script = document.createElement('script');
+                        script.src = `https://maps.googleapis.com/maps/api/js?key=${config.key}&libraries=places,marker&callback=onGoogleMapsReady&loading=async&v=beta`;
+                        script.async = true;
+                        script.defer = true;
+                        window.onGoogleMapsReady = () => resolve();
+                        script.onerror = () => reject(new Error('Maps load failed'));
+                        document.head.appendChild(script);
+                    })
+                    .catch(reject);
+            });
+        }
+
+        async function openLocationSharing() {
             showToast('Preparing location sharing...', 'info');
-            if (typeof google === 'undefined' || !google.maps) {
-                loadGoogleMaps();
-            } else {
+            try {
+                await loadGoogleMaps();
                 document.getElementById('locationSharingModal').classList.add('active');
-                loadEmergencyContacts();
+                currentLocationStep = 1;
+                showLocationStep(currentLocationStep);
+                loadLocationSharingContacts();
+                loadPresetDestinationOptions();
                 initMap(false);
                 setTimeout(() => {
                     if (map) google.maps.event.trigger(map, 'resize');
                 }, 300);
+            } catch (e) {
+                showToast('Failed to load maps', 'error');
             }
         }
 
@@ -562,16 +912,12 @@
                     };
                     break;
                 case 2:
-                    const selectedContacts = Array.from(
-                        document.querySelectorAll('#emergencyContactsList input[type="checkbox"]:checked')
-                    );
+                    const selectedContacts = Array.from(document.querySelectorAll('#emergencyContactsListShare input[type="checkbox"]:checked'));
                     if (selectedContacts.length === 0) {
                         showToast('Please select at least one emergency contact', 'error');
                         return false;
                     }
-                    locationSharingData.emergency_contacts = selectedContacts.map(checkbox => {
-                        return JSON.parse(checkbox.value);
-                    });
+                    locationSharingData.emergency_contacts = selectedContacts.map(checkbox => JSON.parse(checkbox.value));
                     break;
                 case 3:
                     const destination = document.getElementById('destinationInput').value.trim();
@@ -592,28 +938,69 @@
             return true;
         }
 
+        function loadLocationSharingContacts() {
+            const container = document.getElementById('contactsContainerShare');
+            const loading = document.getElementById('contactsLoadingShare');
+            const emptyState = document.getElementById('noContactsMessageShare');
+            const nextBtn = document.getElementById('nextStepBtnShare');
+            container.innerHTML = '';
+            container.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            loading.classList.remove('hidden');
+            fetch('/api/emergency-contacts', { credentials: 'include' })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(contacts => {
+                    loading.classList.add('hidden');
+                    if (contacts.length === 0) {
+                        emptyState.classList.remove('hidden');
+                        return;
+                    }
+                    container.innerHTML = contacts.map(contact => `
+                        <div class="flex items-start p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                            <input type="checkbox" id="contact-${contact.id}" value='${JSON.stringify(contact)}' class="mt-1 mr-3 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="validateContactSelection()">
+                            <div class="flex-1">
+                                <label for="contact-${contact.id}" class="block text-sm font-medium cursor-pointer">${contact.name}</label>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <div class="flex items-center"><i class="fas fa-phone-alt mr-2"></i><span>${contact.phone || 'No phone number'}</span></div>
+                                    ${contact.relationship ? `<div class="flex items-center mt-1"><i class="fas fa-user-tag mr-2"></i><span>${contact.relationship}</span></div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    container.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error loading contacts:', error);
+                    loading.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    emptyState.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <p class="mt-2 text-gray-500 text-sm">Failed to load contacts</p>
+                        <button onclick="loadLocationSharingContacts()" class="mt-3 text-blue-600 text-xs font-medium"><i class="fas fa-sync-alt mr-1"></i> Try again</button>
+                    `;
+                });
+        }
+
         function initMap(shouldOpenModal = true) {
             if (!window.MAP_CONFIG?.mapId) {
                 console.error('Map ID not found in config');
                 showToast('Map configuration error', 'error');
                 return;
             }
-
             try {
-                
                 map = new google.maps.Map(document.getElementById('mapContainer'), {
                     center: { lat: 14.5995, lng: 120.9842 },
                     zoom: 13,
                     mapTypeControl: false,
                     streetViewControl: false,
+                    gestureHandling: 'greedy',
                     mapId: window.MAP_CONFIG.mapId
                 });
-
-                if (!google.maps.places) {
-                    throw new Error('Places library not loaded');
-                }
-
-
                 directionsService = new google.maps.DirectionsService();
                 directionsRenderer = new google.maps.DirectionsRenderer();
                 directionsRenderer.setMap(map);
@@ -622,61 +1009,35 @@
                 const autocomplete = new google.maps.places.Autocomplete(input, {
                     types: ['geocode'],
                     componentRestrictions: { country: 'ph' }
+                    
                 });
 
                 autocomplete.addListener('place_changed', () => {
                     const place = autocomplete.getPlace();
                     if (!place.geometry) return;
-
                     const loc = place.geometry.location;
                     if (!sharingMapMarker) {
-                        const pin = new google.maps.marker.PinElement({
-                            background: '#4285F4',
-                            borderColor: '#ffffff',
-                            glyphColor: '#ffffff',
-                            scale: 1.5
-                        });
-                        pin.element.classList.add('bounce-marker');
+                        const pin = new google.maps.marker.PinElement({ background: '#4285F4', scale: 1.5 });
                         sharingMapMarker = new google.maps.marker.AdvancedMarkerElement({
                             position: { lat: loc.lat(), lng: loc.lng() },
                             map: map,
                             content: pin.element
                         });
-                        setTimeout(() => pin.element.classList.remove('bounce-marker'), 750);
                     } else {
                         sharingMapMarker.position = { lat: loc.lat(), lng: loc.lng() };
-                        const pin = sharingMapMarker.content;
-                        pin.classList.add('bounce-marker');
-                        setTimeout(() => pin.classList.remove('bounce-marker'), 750);
                     }
-
-                    map.setCenter(loc);
+                    map.setCenter({ lat: loc.lat(), lng: loc.lng() });
                     map.setZoom(15);
                 });
 
                 map.addListener("click", (e) => {
                     const position = { lat: e.latLng.lat(), lng: e.latLng.lng() };
                     if (!sharingMapMarker) {
-                        const pin = new google.maps.marker.PinElement({
-                            background: '#4285F4',
-                            borderColor: '#ffffff',
-                            glyphColor: '#ffffff',
-                            scale: 1.5
-                        });
-                        pin.element.classList.add('bounce-marker');
-                        sharingMapMarker = new google.maps.marker.AdvancedMarkerElement({
-                            position: position,
-                            map: map,
-                            content: pin.element
-                        });
-                        setTimeout(() => pin.element.classList.remove('bounce-marker'), 750);
+                        const pin = new google.maps.marker.PinElement({ background: '#4285F4', scale: 1.5 });
+                        sharingMapMarker = new google.maps.marker.AdvancedMarkerElement({ position: position, map: map, content: pin.element });
                     } else {
                         sharingMapMarker.position = position;
-                        const pin = sharingMapMarker.content;
-                        pin.classList.add('bounce-marker');
-                        setTimeout(() => pin.classList.remove('bounce-marker'), 750);
                     }
-
                     new google.maps.Geocoder().geocode({ location: e.latLng }, (results, status) => {
                         if (status === "OK" && results[0]) {
                             document.getElementById("destinationInput").value = results[0].formatted_address;
@@ -684,13 +1045,43 @@
                     });
                 });
 
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
+                            if (!userLocationMarker) {
+                                const pin = new google.maps.marker.PinElement({ background: '#34D399', scale: 1.5 });
+                                userLocationMarker = new google.maps.marker.AdvancedMarkerElement({ position: pos, map: map, content: pin.element });
+                            } else {
+                                userLocationMarker.position = pos;
+                            }
+                            map.setCenter(pos);
+                            map.setZoom(15);
+                        },
+                        () => showToast('Geolocation service failed', 'error')
+                    );
+                }
                 if (shouldOpenModal) {
                     document.getElementById('locationSharingModal').classList.add('active');
-                    loadEmergencyContacts();
+                    loadLocationSharingContacts();
                 }
             } catch (error) {
                 console.error('Error initializing map:', error);
                 showToast('Failed to initialize map', 'error');
+            }
+        }
+
+        function centerMapToUser() {
+            if (navigator.geolocation && userLocationMarker) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
+                        userLocationMarker.position = pos;
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                    },
+                    () => showToast('Unable to get current location', 'error')
+                );
             }
         }
 
@@ -701,12 +1092,8 @@
                 <div>Plate Number: ${puvDetails.plate_number}</div>
                 ${puvDetails.notes ? `<div>Notes: ${puvDetails.notes}</div>` : ''}
             `;
-            document.getElementById('confirmContacts').innerHTML = 
-                locationSharingData.emergency_contacts.map(contact => `
-                    <div>${contact.name} (${contact.phone}) - ${contact.relationship}</div>
-                `).join('');
-            document.getElementById('confirmDestination').textContent = 
-                locationSharingData.destination.address;
+            document.getElementById('confirmContacts').innerHTML = locationSharingData.emergency_contacts.map(contact => `<div>${contact.name} (${contact.phone}) - ${contact.relationship}</div>`).join('');
+            document.getElementById('confirmDestination').textContent = locationSharingData.destination.address;
         }
 
         async function startLocationSharing() {
@@ -714,30 +1101,18 @@
             const originalText = startBtn.innerHTML;
             startBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Starting...';
             startBtn.disabled = true;
-            
             try {
-                if (!navigator.geolocation) {
-                    throw new Error('Geolocation is not supported by your browser');
-                }
-
+                if (!navigator.geolocation) throw new Error('Geolocation is not supported by your browser');
                 const response = await fetch('/api/location-sharing/start', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
-                    },
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(locationSharingData)
                 });
-                
                 const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to start sharing');
-                }
-
+                if (!response.ok) throw new Error(data.error || 'Failed to start sharing');
                 document.getElementById('shareLinkContainer').classList.remove('hidden');
                 document.getElementById('shareableLinkInput').value = data.shareable_link;
-                
                 setTimeout(() => {
                     closeLocationSharing();
                     window.location.href = `/travelling?id=${data.session_id}`;
@@ -777,73 +1152,9 @@
             }
         }
 
-        function loadEmergencyContacts() {
-            const container = document.getElementById('contactsContainer');
-            const loading = document.getElementById('contactsLoading');
-            const emptyState = document.getElementById('noContactsMessage');
-            const nextBtn = document.getElementById('nextStepBtn');
-            container.innerHTML = '';
-            container.classList.add('hidden');
-            emptyState.classList.add('hidden');
-            loading.classList.remove('hidden');
-            fetch('/api/emergency-contacts', {
-                credentials: 'include'
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(contacts => {
-                loading.classList.add('hidden');
-                if (contacts.length === 0) {
-                    emptyState.classList.remove('hidden');
-                    return;
-                }
-                container.innerHTML = contacts.map(contact => `
-                    <div class="flex items-start p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <input type="checkbox" id="contact-${contact.id}" 
-                            value='${JSON.stringify(contact)}'
-                            class="mt-1 mr-3 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            onchange="validateContactSelection()">
-                        <div class="flex-1">
-                            <label for="contact-${contact.id}" class="block font-medium cursor-pointer">${contact.name}</label>
-                            <div class="text-sm text-gray-500 mt-1">
-                                <div class="flex items-center">
-                                    <i class="fas fa-phone-alt mr-2"></i>
-                                    <span>${contact.phone || 'No phone number'}</span>
-                                </div>
-                                ${contact.relationship ? `
-                                <div class="flex items-center mt-1">
-                                    <i class="fas fa-user-tag mr-2"></i>
-                                    <span>${contact.relationship}</span>
-                                </div>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-                container.classList.remove('hidden');
-            })
-            .catch(error => {
-                console.error('Error loading contacts:', error);
-                loading.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                emptyState.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <p class="mt-2 text-gray-500">Failed to load contacts</p>
-                    <button onclick="loadEmergencyContacts()" class="mt-3 text-blue-600 text-sm font-medium">
-                        <i class="fas fa-sync-alt mr-1"></i> Try again
-                    </button>
-                `;
-            });
-        }
-
         function validateContactSelection() {
-            const selectedContacts = Array.from(
-                document.querySelectorAll('#emergencyContactsList input[type="checkbox"]:checked')
-            );
-            const nextBtn = document.getElementById('nextStepBtn');
+            const selectedContacts = Array.from(document.querySelectorAll('#emergencyContactsListShare input[type="checkbox"]:checked'));
+            const nextBtn = document.getElementById('nextStepBtnShare');
             nextBtn.disabled = selectedContacts.length === 0 || selectedContacts.length > 2;
             if (selectedContacts.length > 2) {
                 showToast('You can select maximum 2 contacts', 'warning');
@@ -851,12 +1162,7 @@
         }
 
         function showToast(message, type = 'info') {
-            const colors = {
-                info: 'bg-blue-100 text-blue-800',
-                success: 'bg-green-100 text-green-800',
-                warning: 'bg-yellow-100 text-yellow-800',
-                error: 'bg-red-100 text-red-800'
-            };
+            const colors = { info: 'bg-blue-100 text-blue-800', success: 'bg-green-100 text-green-800', warning: 'bg-yellow-100 text-yellow-800', error: 'bg-red-100 text-red-800' };
             const toast = document.createElement('div');
             toast.className = `fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-md ${colors[type]} text-sm font-medium`;
             toast.textContent = message;
@@ -867,76 +1173,747 @@
             }, 3000);
         }
 
-        function loadGoogleMaps() {
-            fetch('/api/maps-config', {
-                credentials: 'include'
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to get maps config');
-                return response.json();
-            })
-            .then(config => {
-                if (!config.mapId) {
-                    throw new Error('Map ID is required');
+        window.openHistoryModal = function() {
+            document.getElementById('historyModal').classList.add('active');
+            loadTravelHistory();
+        };
+
+        window.closeHistoryModal = function() {
+            document.getElementById('historyModal').classList.remove('active');
+        };
+
+        async function loadTravelHistory(filter = 'all') {
+            const loading = document.getElementById('historyLoading');
+            const empty   = document.getElementById('historyEmpty');
+            const list    = document.getElementById('historyList');
+
+            document.querySelectorAll('#historyModal button[id^="filter"]').forEach(btn => {
+                btn.classList.remove('bg-blue-100','text-blue-800');
+                btn.classList.add('bg-gray-100','text-gray-800');
+            });
+            const activeBtn = document.getElementById(`filter${filter.charAt(0).toUpperCase()}${filter.slice(1)}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-100','text-gray-800');
+                activeBtn.classList.add('bg-blue-100','text-blue-800');
+            }
+
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            list.classList.add('hidden');
+            list.innerHTML = '';
+
+            try {
+                const res = await fetch('/api/travel-history', { credentials: 'include' });
+                if (!res.ok) throw new Error('Failed to fetch history');
+                let history = await res.json();
+
+                const filtered = filter === 'all' ? history : history.filter(t => t.status === filter);
+
+                if (filtered.length === 0) {
+                empty.classList.remove('hidden');
+                if (filter !== 'all') {
+                    empty.innerHTML = `
+                    <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h4 class="mt-3 text-lg font-medium text-gray-700">No ${filter} trips</h4>
+                    <p class="mt-1 text-sm text-gray-500">You don’t have any ${filter} trips yet.</p>
+                    `;
                 }
-                window.MAP_CONFIG = config;
-                
-                const script = document.createElement('script');
-                script.src = `https://maps.googleapis.com/maps/api/js?key=${config.key}&libraries=places,marker&callback=initMap&loading=async&v=beta`;
-                script.async = true;
-                script.defer = true;
-                script.onerror = () => {
-                    showToast('Failed to load maps. Please try again.', 'error');
-                };
-                document.head.appendChild(script);
-            })
-            .catch(error => {
-                console.error('Error loading Google Maps:', error);
-                showToast('Failed to load maps. Please try again.', 'error');
+                return;
+                }
+
+                filtered.sort((a, b) => {
+                const da = a.end_time?.toDate?.() || a.created_at?.toDate?.() || new Date(0);
+                const db = b.end_time?.toDate?.() || b.created_at?.toDate?.() || new Date(0);
+                return db - da;
+                });
+
+                list.innerHTML = filtered.map(trip => `
+                <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors border-l-4 ${getStatusBorderClass(trip.status)}">
+                    <div class="flex justify-between items-start">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center">
+                        <i class="fas fa-${getVehicleIcon(trip.puv_type)} text-gray-500 mr-3"></i>
+                        <h4 class="font-medium text-gray-800 truncate">${trip.destination || 'No destination'}</h4>
+                        </div>
+                        <div class="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
+                        <div class="flex items-center"><i class="far fa-calendar-alt mr-2"></i>${formatTripDate(trip)}</div>
+                        ${trip.puv_type ? `<div class="flex items-center"><i class="fas fa-car mr-2"></i>${trip.puv_type}${trip.vehicle_plate ? ` (${trip.vehicle_plate})` : ''}</div>` : ''}
+                        ${trip.end_time ? `<div class="flex items-center"><i class="far fa-clock mr-2"></i>${formatTripDuration(trip)}</div>` : ''}
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusClass(trip.status)}">${trip.status || 'completed'}</span>
+                    </div>
+                    ${trip.notes ? `<div class="mt-3 pt-2 border-t border-gray-200"><p class="text-xs font-medium text-gray-500 mb-1">Notes:</p><p class="text-sm text-gray-600">${trip.notes}</p></div>` : ''}
+                    ${trip.sos_triggered ? `<div class="mt-2 flex items-center text-xs text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i>Emergency alert triggered</div>` : ''}
+                </div>
+                `).join('');
+                list.classList.remove('hidden');
+            } catch (e) {
+                console.error(e);
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+                empty.innerHTML = `
+                <svg class="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856…" />
+                </svg>
+                <h4 class="mt-3 text-lg font-medium text-gray-700">Failed to load history</h4>
+                <p class="mt-1 text-sm text-gray-500">${e.message || 'Please try again later'}</p>
+                <button onclick="loadTravelHistory('${filter}')" class="mt-3 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm"><i class="fas fa-sync-alt mr-2"></i> Retry</button>
+                `;
+            } finally {
+                loading.classList.add('hidden');
+            }
+            }
+
+        function getVehicleIcon(type) {
+            const icons = { bus: 'bus', jeepney: 'bus-alt', taxi: 'taxi', tricycle: 'motorcycle', van: 'shuttle-van' };
+            return icons[type?.toLowerCase()] || 'car';
+        }
+
+        function getStatusClass(status) {
+            return { completed: 'bg-green-100 text-green-800', cancelled: 'bg-yellow-100 text-yellow-800', sos: 'bg-red-100 text-red-800' }[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusBorderClass(status) {
+            return { completed: 'border-green-400', cancelled: 'border-yellow-400', sos: 'border-red-400' }[status?.toLowerCase()] || 'border-gray-400';
+        }
+
+        function formatTripDate(trip) {
+            if (!trip.start_time) return 'No date specified';
+            const toDate = v => !v ? null : (v.toDate ? v.toDate() : new Date(v));
+            const startDate = toDate(trip.start_time);
+            const endDate = toDate(trip.end_time);
+            const options = { month: 'short', day: 'numeric' };
+            const startStr = startDate.toLocaleDateString(undefined, options);
+            if (!endDate) return `${startStr} (Ongoing)`;
+            if (startDate.toDateString() === endDate.toDateString()) {
+                const fmt = d => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return `${startStr} • ${fmt(startDate)} - ${fmt(endDate)}`;
+            }
+            const endStr = endDate.toLocaleDateString(undefined, options);
+            return `${startStr} - ${endStr}`;
+        }
+
+        function formatTripDuration(trip) {
+            if (!trip.start_time) return '';
+            const toDate = v => !v ? new Date() : (v.toDate ? v.toDate() : new Date(v));
+            const start = toDate(trip.start_time);
+            const end = toDate(trip.end_time);
+            const minutes = Math.round((end - start) / 60000);
+            if (minutes < 1) return '<1 min';
+            if (minutes < 60) return `${minutes} min`;
+            const hours = Math.floor(minutes / 60);
+            const remainingMins = minutes % 60;
+            return `${hours}h ${remainingMins}m`;
+        }
+
+        function filterHistory(filter) {
+            loadTravelHistory(filter);
+        }
+
+        window.openPresetsModal = function() {
+            document.getElementById('presetsModal').classList.add('active');
+            loadPresetDestinations();
+        };
+
+        window.closePresetsModal = function() {
+            document.getElementById('presetsModal').classList.remove('active');
+            hidePresetForm();
+        };
+
+        let presetMap, presetMarker;
+        let editingPresetId = null;
+
+        async function showPresetForm(preset = null) {
+            editingPresetId = preset?.id || null;
+            document.getElementById('presetsList').classList.add('hidden');
+            document.getElementById('presetsEmpty').classList.add('hidden');
+            document.getElementById('presetForm').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = preset ? 'Edit Destination' : 'Add New Destination';
+            document.getElementById('presetName').value = preset?.name || '';
+            document.getElementById('presetAddress').value = preset?.address || '';
+            document.querySelector('#presetsModal button[onclick="showPresetForm()"]').classList.add('hidden');
+            try {
+                await loadGoogleMaps();
+                initPresetMap(preset?.coordinates || null);
+            } catch (e) {
+                showToast('Failed to load map', 'error');
+            }
+        }
+
+        function hidePresetForm() {
+            document.getElementById('presetForm').classList.add('hidden');
+            document.getElementById('presetsList').classList.remove('hidden');
+            document.querySelector('#presetsModal button[onclick="showPresetForm()"]').classList.remove('hidden');
+            editingPresetId = null;
+        }
+
+        function initPresetMap(initialPosition = null) {
+            const mapContainer = document.getElementById('presetMapContainer');
+            if (!mapContainer || !window.google || !window.google.maps) return;
+            if (presetMap) {
+                presetMap.unbindAll();
+                presetMap = null;
+            }
+            const position = initialPosition || { lat: 14.5995, lng: 120.9842 };
+            presetMap = new google.maps.Map(mapContainer, {
+                center: position,
+                zoom: 15,
+                mapId: window.MAP_CONFIG?.mapId,
+                mapTypeControl: false,
+                streetViewControl: false
+            });
+            if (initialPosition) {
+                presetMarker = new google.maps.Marker({ position: position, map: presetMap, draggable: true });
+            }
+            presetMap.addListener('click', (e) => {
+                const position = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                if (!presetMarker) {
+                    presetMarker = new google.maps.Marker({ position: position, map: presetMap, draggable: true });
+                } else {
+                    presetMarker.setPosition(position);
+                }
+                new google.maps.Geocoder().geocode({ location: e.latLng }, (results, status) => {
+                    if (status === "OK" && results[0]) {
+                        document.getElementById("presetAddress").value = results[0].formatted_address;
+                    }
+                });
+            });
+            const autocomplete = new google.maps.places.Autocomplete(document.getElementById('presetAddress'), {
+                types: ['geocode'],
+                componentRestrictions: { country: 'ph' }
+            });
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) return;
+                const position = place.geometry.location;
+                if (presetMarker) {
+                    presetMarker.setPosition(position);
+                } else {
+                    presetMarker = new google.maps.Marker({ position: position, map: presetMap, draggable: true });
+                }
+                presetMap.setCenter(position);
+                presetMap.setZoom(15);
             });
         }
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            const now = new Date();
-            const timeElement = document.getElementById('current-time');
-            if(timeElement) {
-                timeElement.textContent = now.toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
+        function centerPresetMapToUser() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
+                        if (presetMap) {
+                            presetMap.setCenter(pos);
+                            presetMap.setZoom(15);
+                            if (presetMarker) {
+                                presetMarker.setPosition(pos);
+                            } else {
+                                presetMarker = new google.maps.Marker({ position: pos, map: presetMap, draggable: true });
+                            }
+                            new google.maps.Geocoder().geocode({ location: pos }, (results, status) => {
+                                if (status === "OK" && results[0]) {
+                                    document.getElementById("presetAddress").value = results[0].formatted_address;
+                                }
+                            });
+                        }
+                    },
+                    () => showToast('Unable to get current location', 'error')
+                );
             }
-            window.closeModal = function() {
-                document.getElementById('welcomeModal')?.classList.remove('active');
-            };
-            window.openSettingsModal = function() {
-                document.getElementById('settingsModal')?.classList.add('active');
-            };
-            window.closeSettingsModal = function() {
-                document.getElementById('settingsModal')?.classList.remove('active');
-            };
-            window.openChatModal = function() {
-                document.getElementById('chatModal')?.classList.add('active');
-                document.getElementById('chatInput')?.focus();
-            };
-            window.closeChatModal = function() {
-                document.getElementById('chatModal')?.classList.remove('active');
-            };
-            const isNewUser = {{ user.is_new_user | tojson }};
-            if (isNewUser) {
-                document.getElementById('onboardingModal')?.classList.remove('hidden');
-                showStep(1);
-            } else {
-                document.getElementById('welcomeModal')?.classList.add('active');
-                setTimeout(closeModal, 4000);
-            }
-            // Chat input event listener
-            document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendChatMessage();
+        }
+
+        async function loadPresetDestinations() {
+            const loading = document.getElementById('presetsLoading');
+            const empty = document.getElementById('presetsEmpty');
+            const list = document.getElementById('presetsList');
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            list.classList.add('hidden');
+            list.innerHTML = '';
+            try {
+                if (!cachedPresets) {
+                    const res = await fetch('/api/preset-destinations', { credentials: 'include' });
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    cachedPresets = await res.json();
                 }
+                const dropdown = document.getElementById('presetDestinationSelect');
+                dropdown.innerHTML = '<option value="">Select a preset destination</option>';
+                cachedPresets.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.name;
+                    dropdown.appendChild(opt);
+                });
+                if (cachedPresets.length === 0) {
+                    empty.classList.remove('hidden');
+                } else {
+                    list.innerHTML = cachedPresets.map(p => `
+                        <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-medium text-gray-800 truncate">${p.name}</h4>
+                                    <p class="text-xs text-gray-500 mt-1 truncate">${p.address}</p>
+                                </div>
+                                <div class="flex space-x-2 ml-2">
+                                    <button onclick="showPresetForm(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="p-1 text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    <button onclick="deletePreset('${p.id}')" class="p-1 text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    list.classList.remove('hidden');
+                }
+            } catch (e) {
+                console.error('Error loading preset destinations:', e);
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+                empty.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856…" />
+                    </svg>
+                    <h4 class="mt-3 text-lg font-medium text-gray-700">Failed to load destinations</h4>
+                    <p class="mt-1 text-sm text-gray-500">${e.message || 'Please try again later'}</p>
+                    <button onclick="loadPresetDestinations()" class="mt-3 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm"><i class="fas fa-sync-alt mr-2"></i> Retry</button>
+                `;
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        async function loadPresetDestinationOptions() {
+            const dropdown = document.getElementById('presetDestinationSelect');
+            if (!dropdown) return;
+
+            // always ensure presets are loaded
+            if (!cachedPresets) {
+                const res = await fetch('/api/preset-destinations', { credentials: 'include' });
+                cachedPresets = await res.json();
+            }
+
+            dropdown.innerHTML = '<option value="">Select a preset destination</option>';
+            cachedPresets.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name;
+                dropdown.appendChild(opt);
             });
+        }
+
+        function selectPresetDestination(presetId) {
+            if (!presetId) return;
+            const preset = cachedPresets?.find(p => p.id === presetId);
+            if (!preset) {
+                showToast('Preset not found', 'error');
+                return;
+            }
+            document.getElementById('destinationInput').value = preset.address;
+            if (preset.coordinates && map) {
+                const pos = { lat: preset.coordinates.lat, lng: preset.coordinates.lng };
+                if (!sharingMapMarker) {
+                    const pin = new google.maps.marker.PinElement({ background: '#4285F4', scale: 1.5 });
+                    sharingMapMarker = new google.maps.marker.AdvancedMarkerElement({ position: pos, map: map, content: pin.element });
+                } else {
+                    sharingMapMarker.position = pos;
+                }
+                map.setCenter(pos);
+                map.setZoom(15);
+            }
+        }
+
+        async function savePreset() {
+            const name = document.getElementById('presetName').value.trim();
+            const address = document.getElementById('presetAddress').value.trim();
+            const saveBtn = document.getElementById('savePresetBtn');
+            if (!name || !address) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            const presetData = { name, address };
+            if (presetMarker) {
+                presetData.coordinates = { lat: presetMarker.getPosition().lat(), lng: presetMarker.getPosition().lng() };
+            }
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
+            saveBtn.disabled = true;
+            const url = editingPresetId ? `/api/preset-destinations/${editingPresetId}` : '/api/preset-destinations';
+            const method = editingPresetId ? 'PUT' : 'POST';
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(presetData)
+                });
+                if (!res.ok) throw new Error('Failed to save preset');
+                showToast(`Preset ${editingPresetId ? 'updated' : 'saved'} successfully`, 'success');
+                hidePresetForm();
+                cachedPresets = null;
+                loadPresetDestinations();
+            } catch (e) {
+                console.error('Error saving preset:', e);
+                showToast(`Error: ${e.message}`, 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+
+        async function deletePreset(presetId) {
+            if (!confirm('Are you sure you want to delete this preset destination?')) return;
+            try {
+                const res = await fetch(`/api/preset-destinations/${presetId}`, { method: 'DELETE', credentials: 'include' });
+                if (!res.ok) throw new Error('Failed to delete preset');
+                showToast('Preset deleted successfully', 'success');
+                cachedPresets = null;
+                loadPresetDestinations();
+            } catch (e) {
+                console.error('Error deleting preset:', e);
+                showToast(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            const chatContainer = document.getElementById('chatMessages');
+            if (!chatContainer) return;
+            chatContainer.insertAdjacentHTML('beforeend', `
+                <div class="flex justify-end">
+                    <div class="bg-blue-100 p-3 rounded-xl rounded-br-none max-w-[85%]">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                </div>
+            `);
+            input.value = '';
+            chatContainer.insertAdjacentHTML('beforeend', `
+                <div id="typing-indicator" class="flex">
+                    <div class="bg-blue-50 p-3 rounded-xl rounded-tl-none max-w-[85%]">
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('typing-indicator')?.remove();
+                if (data.response) {
+                    chatContainer.insertAdjacentHTML('beforeend', `
+                        <div class="flex">
+                            <div class="bg-blue-50 p-3 rounded-xl rounded-tl-none max-w-[85%] prose prose-sm prose-blue">
+                                ${marked.parse(data.response)}
+                            </div>
+                        </div>
+                    `);
+                } else if (data.error) {
+                    chatContainer.insertAdjacentHTML('beforeend', `
+                        <div class="flex">
+                            <div class="bg-red-50 p-3 rounded-xl rounded-tl-none max-w-[85%]">
+                                <p class="text-sm text-red-600">Error: ${data.error}</p>
+                            </div>
+                        </div>
+                    `);
+                }
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            })
+            .catch(error => {
+                document.getElementById('typing-indicator')?.remove();
+                chatContainer.insertAdjacentHTML('beforeend', `
+                    <div class="flex">
+                        <div class="bg-red-50 p-3 rounded-xl rounded-tl-none max-w-[85%]">
+                            <p class="text-sm text-red-600">Error: ${error.message}</p>
+                        </div>
+                    </div>
+                `);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+        }
+
+        window.openEmergencyContactsModal = function() {
+            document.getElementById('emergencyContactsModal').classList.add('active');
+            loadEmergencyContacts();
+        };
+
+        window.closeEmergencyContactsModal = function() {
+            document.getElementById('emergencyContactsModal').classList.remove('active');
+            hideEmergencyContactForm();
+        };
+
+        let editingContactId = null;
+
+        async function loadEmergencyContacts() {
+            const loading = document.getElementById('emergencyContactsLoadingModal');
+            const empty = document.getElementById('emergencyContactsEmptyModal');
+            const list = document.getElementById('emergencyContactsListModal');
+            
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            list.classList.add('hidden');
+            list.innerHTML = '';
+            
+            try {
+                const res = await fetch('/api/emergency-contacts', { credentials: 'include' });
+                if (!res.ok) throw new Error('Network response was not                ok');
+                const contacts = await res.json();
+                
+                if (contacts.length === 0) {
+                    empty.classList.remove('hidden');
+                } else {
+                    list.innerHTML = contacts.map(c => `
+                        <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-medium text-gray-800">${c.name}</h4>
+                                    <p class="text-xs text-gray-500 mt-1">${c.phone}</p>
+                                    ${c.relationship ? `<p class="text-xs text-gray-400 mt-1">${c.relationship}</p>` : ''}
+                                </div>
+                                <div class="flex space-x-2 ml-2">
+                                    <button onclick="showEmergencyContactForm(${JSON.stringify(c).replace(/"/g, '&quot;')})" 
+                                            class="p-1 text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteEmergencyContact('${c.id}')" 
+                                            class="p-1 text-red-600 hover:text-red-800"
+                                            ${contacts.length <= 1 ? 'disabled' : ''}>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    list.classList.remove('hidden');
+                }
+            } catch (e) {
+                console.error('Error loading emergency contacts:', e);
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+                empty.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <h4 class="mt-3 text-lg font-medium text-gray-700">Failed to load contacts</h4>
+                    <p class="mt-1 text-sm text-gray-500">${e.message || 'Please try again later'}</p>
+                    <button onclick="loadEmergencyContacts()" class="mt-3 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm">
+                        <i class="fas fa-sync-alt mr-2"></i> Retry
+                    </button>
+                `;
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function showEmergencyContactForm(contact = null) {
+            editingContactId = contact?.id || null;
+            document.getElementById('emergencyContactsListModal').classList.add('hidden');
+            document.getElementById('emergencyContactsEmptyModal').classList.add('hidden');
+            document.getElementById('emergencyContactForm').classList.remove('hidden');
+            
+            document.getElementById('contactFormTitle').textContent = contact ? 'Edit Contact' : 'Add New Contact';
+            document.getElementById('EcontactName').value = contact?.name || '';
+            document.getElementById('EcontactPhone').value = contact?.phone || '';
+            document.getElementById('contactRelationship').value = contact?.relationship || '';
+            
+            document.querySelector('#emergencyContactsModal button[onclick="showEmergencyContactForm()"]').classList.add('hidden');
+        }
+
+        function hideEmergencyContactForm() {
+            document.getElementById('emergencyContactForm').classList.add('hidden');
+            document.getElementById('emergencyContactsListModal').classList.remove('hidden');
+            document.querySelector('#emergencyContactsModal button[onclick="showEmergencyContactForm()"]').classList.remove('hidden');
+            editingContactId = null;
+        }
+
+        async function saveEmergencyContact() {
+            const name = document.getElementById('EcontactName').value.trim();
+            const phone = document.getElementById('EcontactPhone').value.trim();
+            const relationship = document.getElementById('contactRelationship').value;
+            const saveBtn = document.getElementById('saveContactBtn');
+
+            console.log(name)
+            console.log(phone)
+            console.log(relationship)
+            
+            if (!name || !phone) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            const contactData = { name, phone, relationship };
+            const originalText = saveBtn.innerHTML;
+            
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
+            saveBtn.disabled = true;
+            
+            const url = editingContactId ? `/api/emergency-contacts/${editingContactId}` : '/api/push-emergency-contacts';
+            const method = editingContactId ? 'PUT' : 'POST';
+            
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(contactData)
+                });
+                
+                if (!res.ok) {
+                    const error = await res.json();
+                    throw new Error(error.error || 'Failed to save contact');
+                }
+                
+                showToast(`Contact ${editingContactId ? 'updated' : 'saved'} successfully`, 'success');
+                hideEmergencyContactForm();
+                loadEmergencyContacts();
+                
+                if (document.getElementById('locationSharingModal').classList.contains('active')) {
+                    loadLocationSharingContacts();
+                }
+            } catch (e) {
+                console.error('Error saving contact:', e);
+                showToast(`Error: ${e.message}`, 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+
+        async function deleteEmergencyContact(contactId) {
+            if (!confirm('Are you sure you want to delete this emergency contact?')) return;
+            
+            try {
+                const res = await fetch(`/api/emergency-contacts/${contactId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                if (!res.ok) {
+                    const error = await res.json();
+                    throw new Error(error.error || 'Failed to delete contact');
+                }
+                
+                showToast('Contact deleted successfully', 'success');
+                loadEmergencyContacts();
+            } catch (e) {
+                console.error('Error deleting contact:', e);
+                showToast(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        function openHelpSupportModal() {
+            document.getElementById('helpSupportModal').classList.add('active');
+        }
+        function closeHelpSupportModal() {
+            document.getElementById('helpSupportModal').classList.remove('active');
+        }
+
+        /* ---- Application Guide ---- */
+        function openAppGuide() {
+            closeHelpSupportModal();
+            document.getElementById('appGuideModal').classList.add('active');
+        }
+        function closeAppGuide() {
+            document.getElementById('appGuideModal').classList.remove('active');
+        }
+
+        /* ---- Support Email ---- */
+        function openSupportEmail() {
+            window.open('mailto:travelguard.help@gmail.com?subject=TravelGuard%20Support&body=Hi%20TravelGuard%20Team,%0D%0A%0D%0AI%20need%20help%20with%20the%20following%20issue:%0D%0A%0D%0A', '_blank');
+        }
+
+        /* ---- Tips & Tricks ---- */
+        function openTipsTricks() {
+            closeHelpSupportModal();
+            document.getElementById('tipsModal').classList.add('active');
+        }
+        function closeTipsTricks() {
+            document.getElementById('tipsModal').classList.remove('active');
+        }
+
+        // Add these functions to the existing script section
+
+async function openEditProfileForm() {
+    try {
+        const res = await fetch('/api/user/profile', { 
+            credentials: 'include' 
         });
+        const userData = await res.json();
+        
+        // Populate form with current data
+        document.getElementById('editName').value = userData.name || '';
+        document.getElementById('editPhone').value = userData.phone || '';
+        
+        // Show form with animation
+        document.getElementById('editProfileForm').classList.remove('hidden');
+            } catch (error) {
+                showToast('Failed to load profile data', 'error');
+            }
+        }
+
+        function closeEditProfileForm() {
+            document.getElementById('editProfileForm').classList.add('hidden');
+        }
+
+        async function saveProfileChanges() {
+            const name = document.getElementById('editName').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            
+            // Validation
+            if (!name || !phone) {
+                showToast('Name and phone number are required', 'error');
+                return;
+            }
+            
+            // Phone format validation (Philippine format)
+            const phoneRegex = /^(\+63|0)?9\d{9}$/;
+            if (!phoneRegex.test(phone.replace(/\s+/g, ''))) {
+                showToast('Please enter a valid Philippine phone number', 'error');
+                return;
+            }
+            
+            const saveBtn = event.target;
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+            saveBtn.disabled = true;
+            
+            try {
+                const res = await fetch('/api/complete-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ 
+                        phone: phone,
+                        name: name  // Adding name field to existing endpoint
+                    })
+                });
+                
+                if (!res.ok) throw new Error('Failed to update profile');
+                
+                showToast('Profile updated successfully', 'success');
+                closeEditProfileForm();
+                
+                // Update UI elements that display user info
+                const userNameElements = document.querySelectorAll('#userName, .user-display-name');
+                userNameElements.forEach(el => el.textContent = name);
+                
+            } catch (error) {
+                showToast('Error updating profile: ' + error.message, 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        }
     </script>
 </body>
 </html>

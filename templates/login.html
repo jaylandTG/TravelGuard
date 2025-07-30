@@ -3,11 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Travel Guard">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icon-192.png">
+    
     <title>Travel Guard - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -116,6 +125,69 @@
         </div>
     </div>
 
+    <!-- INSTALL BUTTON (top-right) -->
+<button id="installBtn"
+        class="fixed top-4 right-4 z-50 bg-blue-600 text-white rounded-full px-3 py-2 shadow-lg hidden">
+  <i class="fas fa-download"></i> Install
+</button>
+
+<!-- INSTALL MODAL -->
+<div id="installModal"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] hidden">
+  <div class="bg-white rounded-xl p-6 w-11/12 max-w-sm text-center">
+    <h3 class="font-bold text-lg mb-4">Install Travel Guard</h3>
+
+    <!-- Android -->
+    <button id="androidBtn"
+            class="w-full bg-green-600 text-white py-3 rounded-lg mb-2 flex items-center justify-center">
+      <i class="fab fa-android mr-2"></i> Android
+    </button>
+
+    <!-- iOS -->
+    <button id="iosBtn"
+            class="w-full bg-gray-800 text-white py-3 rounded-lg flex items-center justify-center">
+      <i class="fab fa-apple mr-2"></i> iOS
+    </button>
+
+    <button id="closeModal"
+            class="mt-4 text-sm text-gray-500 underline">Close</button>
+  </div>
+</div>
+
+    <!-- iOS HOW-TO SLIDESHOW -->
+    <div id="iosGuide"
+        class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[70] hidden">
+    <div class="bg-white rounded-xl p-4 w-full max-w-xs relative">
+        <button id="closeGuide"
+                class="absolute top-2 right-2 text-xl">&times;</button>
+        <!-- Swiper or simple carousel -->
+        <div class="overflow-hidden">
+        <div id="slides" class="flex transition-transform duration-300">
+            <!-- slide 1 -->
+            <div class="w-full flex-shrink-0">
+            <img src="/static/ios1.jpg" class="rounded w-full" alt="Step 1">
+            <p class="text-center mt-2 text-sm">1. Tap the share icon in Safari</p>
+            </div>
+            <!-- slide 2 -->
+            <div class="w-full flex-shrink-0">
+            <img src="/static/ios2.jpg" class="rounded w-full" alt="Step 2">
+            <p class="text-center mt-2 text-sm">2. Choose “Add to Home Screen”</p>
+            </div>
+            <!-- slide 3 -->
+            <div class="w-full flex-shrink-0">
+            <img src="/static/ios3.jpg" class="rounded w-full" alt="Step 3">
+            <p class="text-center mt-2 text-sm">3. Tap “Add” and you’re done!</p>
+            </div>
+        </div>
+        </div>
+        <div class="flex justify-center mt-2 space-x-2">
+        <span class="dot w-2 h-2 rounded-full bg-blue-600"></span>
+        <span class="dot w-2 h-2 rounded-full bg-gray-300"></span>
+        <span class="dot w-2 h-2 rounded-full bg-gray-300"></span>
+        </div>
+    </div>
+    </div>
+
     <script>
         // Firebase configuration from Flask template
         const firebaseConfig = {{ firebase_config|tojson|safe }};
@@ -167,6 +239,77 @@
                 btn.innerHTML = '<img src="static/google.svg" alt="Google logo" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3"><span class="text-sm sm:text-base">Continue with Google</span>';
             }
         });
+
+        /* 1️⃣  Register service worker */
+        if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/static/sw.js');
+        });
+        }
+
+        /* 2️⃣  Web-app install prompt (Android) */
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        const installModal = document.getElementById('installModal');
+        const androidBtn = document.getElementById('androidBtn');
+        const iosBtn = document.getElementById('iosBtn');
+        const iosGuide = document.getElementById('iosGuide');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.classList.remove('hidden');
+        });
+
+        installBtn.addEventListener('click', () => {
+        installModal.classList.remove('hidden');
+        });
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+        installModal.classList.add('hidden');
+        });
+
+        androidBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            installModal.classList.add('hidden');
+        }
+        deferredPrompt = null;
+        });
+
+        /* 3️⃣  iOS guide slideshow */
+        iosBtn.addEventListener('click', () => {
+        installModal.classList.add('hidden');
+        iosGuide.classList.remove('hidden');
+        });
+
+        document.getElementById('closeGuide').addEventListener('click', () => {
+        iosGuide.classList.add('hidden');
+        });
+
+        /* simple dot navigation */
+        const dots = document.querySelectorAll('.dot');
+        const slides = document.getElementById('slides');
+        let slide = 0;
+        function move() {
+        slides.style.transform = `translateX(-${slide * 100}%)`;
+        dots.forEach((d, i) => d.classList.toggle('bg-blue-600', i === slide));
+        dots.forEach((d, i) => d.classList.toggle('bg-gray-300', i !== slide));
+        }
+        dots.forEach((d, i) => d.addEventListener('click', () => { slide = i; move(); }));
+
+        const isStandalone =
+        // iOS Safari
+        window.navigator.standalone ||
+        // Android Chrome / Edge / Samsung
+        (window.matchMedia &&
+        window.matchMedia('(display-mode: standalone)').matches);
+
+        if (isStandalone) {
+        document.getElementById('installBtn').classList.add('hidden');
+        }
     </script>
 </body>
 </html>

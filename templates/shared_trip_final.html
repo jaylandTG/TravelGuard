@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icon-192.png">
   <title>{{ title }} - Travel Guard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -21,18 +22,6 @@
 
     <!-- Subtext -->
     <p class="text-sm text-gray-600 mb-6">{{ subtext }}</p>
-
-    <!-- Optional last-location mini-map (only for SOS) -->
-    {% if title == "SOS Alert" %}
-    <div class="mb-4">
-      <a href="https://www.google.com/maps/search/?api=1&query={{ current_loc.get('lat') }},{{ current_loc.get('lng') }}"
-         target="_blank"
-         class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-        <i class="fas fa-map-marker-alt mr-2"></i>
-        View on Google Maps
-      </a>
-    </div>
-    {% endif %}
 
     <!-- Done button -->
     <button onclick="window.close();" class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
