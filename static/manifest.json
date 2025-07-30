@@ -2,7 +2,7 @@
   "name": "Travel Guard",
   "short_name": "TravelGuard",
   "description": "Your journey’s safety companion",
-  "start_url": "/dashbooard",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
