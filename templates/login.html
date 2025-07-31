@@ -3,33 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Travel Guard">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icon-192.png">
+
     <title>Travel Guard - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
         }
-        
+
         .card-shadow {
             box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.1);
         }
-        
+
         .google-btn {
             transition: all 0.3s ease;
         }
-        
+
         .google-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
         }
-        
+
         .travel-guard-logo::after {
             content: '';
             position: absolute;
@@ -41,26 +50,33 @@
             background: #3b82f6;
             border-radius: 3px;
         }
+        
+        /* Style for the swipable guide */
+        #slides {
+            /* This will be controlled by JavaScript */
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .guide-image {
+            height: 50vh;
+            object-fit: contain;
+        }
 
         @media (max-width: 640px) {
             body {
                 padding: 1rem;
                 display: block;
             }
-            
             .card-shadow {
                 box-shadow: 0 2px 10px -3px rgba(0, 0, 0, 0.1);
             }
-            
             input, button {
                 font-size: 16px;
             }
-            
             .travel-guard-logo svg {
                 height: 8vw;
                 width: 8vw;
             }
-            
             .travel-guard-logo span {
                 font-size: 5vw;
             }
@@ -68,9 +84,9 @@
     </style>
 </head>
 <body class="flex items-center justify-center p-4 sm:p-6">
+
     <div class="w-full max-w-md mx-auto">
         <div class="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 card-shadow">
-            <!-- Travel Guard Logo -->
             <div class="flex justify-center mb-6 sm:mb-8 travel-guard-logo">
                 <div class="text-center">
                     <div class="flex items-center justify-center">
@@ -82,31 +98,25 @@
                     <p class="text-xs sm:text-sm text-gray-500 mt-1">Your journey's safety companion</p>
                 </div>
             </div>
-            
-            <!-- Welcome Message -->
+
             <div class="text-center mb-6 sm:mb-8">
                 <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Welcome Back</h2>
                 <p class="text-sm text-gray-500">Sign in to access your travel protection</p>
             </div>
             
-            <!-- Google Login Button -->
-            <div class="mb-4 sm:mb-6">
-                <button id="googleLoginBtn" class="w-full flex items-center justify-center py-2 sm:py-3 px-4 border border-gray-300 rounded-lg google-btn bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <img src="static/google.svg" alt="Google logo" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3">
-                    <span class="text-sm sm:text-base">Continue with Google</span>
-                </button>
-            </div>
-            
-            <!-- Sign Up Link -->
+            <div id="error-message-container" class="mb-4"></div>
+
+            <div id="loginButtonContainer" class="mb-4 sm:mb-6">
+                </div>
+
             <div class="mt-4 sm:mt-6 text-center">
                 <p class="text-xs sm:text-sm text-gray-600">
-                    Don't have an account? 
-                    <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Sign up</a>
+                    Don't have an account?
+                    <a href="#" id="signUpLink" class="font-medium text-blue-600 hover:text-blue-500">Sign up</a>
                 </p>
             </div>
         </div>
-        
-        <!-- Footer Links -->
+
         <div class="mt-4 sm:mt-6 text-center text-xs text-gray-500">
             <a href="#" class="hover:text-gray-700">Terms</a>
             <span class="mx-1 sm:mx-2">•</span>
@@ -116,45 +126,169 @@
         </div>
     </div>
 
+    <button id="installBtn"
+            class="fixed top-4 right-4 z-50 bg-blue-600 text-white rounded-full px-3 py-2 shadow-lg hidden">
+        <i class="fas fa-download"></i> Install
+    </button>
+
+    <div id="installModal"
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] hidden">
+        <div class="bg-white rounded-xl p-6 w-11/12 max-w-sm text-center">
+            <h3 class="font-bold text-lg mb-4">Install Travel Guard</h3>
+            <button id="androidBtn"
+                    class="w-full bg-green-600 text-white py-3 rounded-lg mb-2 flex items-center justify-center">
+                <i class="fab fa-android mr-2"></i> Android
+            </button>
+            <button id="iosBtn"
+                    class="w-full bg-gray-800 text-white py-3 rounded-lg flex items-center justify-center">
+                <i class="fab fa-apple mr-2"></i> iOS
+            </button>
+            <button id="closeModal"
+                    class="mt-4 text-sm text-gray-500 underline">Close</button>
+        </div>
+    </div>
+
+    <div id="iosGuide"
+         class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[70] hidden">
+        <div class="bg-white rounded-xl p-4 w-full max-w-xs relative">
+            <button id="closeGuide"
+                    class="absolute top-2 right-2 text-xl z-10">&times;</button>
+            <div class="overflow-hidden">
+                <div id="slides" class="flex">
+                    <div class="w-full flex-shrink-0">
+                        <img src="/static/ios1.jpg" class="rounded w-full guide-image" alt="Step 1">
+                        <p class="text-center mt-2 text-sm">1. Tap the share icon in Safari</p>
+                    </div>
+                    <div class="w-full flex-shrink-0">
+                        <img src="/static/ios2.jpg" class="rounded w-full guide-image" alt="Step 2">
+                        <p class="text-center mt-2 text-sm">2. Choose “Add to Home Screen”</p>
+                    </div>
+                    <div class="w-full flex-shrink-0">
+                        <img src="/static/ios3.jpg" class="rounded w-full guide-image" alt="Step 3">
+                        <p class="text-center mt-2 text-sm">3. Tap “Add” and you’re done!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center mt-2 space-x-2 dots-container">
+                <span class="dot w-2 h-2 rounded-full bg-blue-600"></span>
+                <span class="dot w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="dot w-2 h-2 rounded-full bg-gray-300"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="passcodeLoginModal"
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] hidden">
+        <div class="bg-white rounded-xl p-6 w-11/12 max-w-sm">
+            <h3 class="text-lg font-bold mb-4 text-center">Passcode Login</h3>
+            <form id="passcodeForm" action="/api/login-passcode" method="POST">
+                <input type="email" name="email" placeholder="Email" required
+                    class="w-full p-2 border rounded mb-3 text-sm">
+                <input type="password" name="passcode" placeholder="6-digit passcode" maxlength="6" pattern="\d{6}" inputmode="numeric" required
+                    class="w-full p-2 border rounded mb-4 text-sm">
+                <button type="submit"
+                        class="w-full py-2 bg-blue-600 text-white rounded text-sm">Login</button>
+            </form>
+            <button onclick="document.getElementById('passcodeLoginModal').classList.add('hidden')"
+                    class="w-full mt-3 text-xs text-gray-500 underline">Cancel</button>
+        </div>
+    </div>
+    
+    <div id="pwaSignupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] hidden">
+        <div class="bg-white rounded-xl p-6 w-11/12 max-w-sm text-center">
+            <h3 class="text-lg font-bold mb-2">Sign Up</h3>
+            <p class="text-sm text-gray-700 mb-4">To sign up, please open <strong class="text-blue-600">travelguardapp.vercel.app</strong> in your mobile browser to register your account and set your passcode.</p>
+            <button onclick="document.getElementById('pwaSignupModal').classList.add('hidden')"
+                    class="w-full py-2 bg-blue-600 text-white rounded text-sm">OK</button>
+        </div>
+    </div>
+
+
     <script>
         // Firebase configuration from Flask template
         const firebaseConfig = {{ firebase_config|tojson|safe }};
-        
+
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        
-        // Google login functionality
-        document.getElementById('googleLoginBtn').addEventListener('click', async function() {
-            const btn = this;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-    
+
+        // Service worker registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js');
+            });
+        }
+
+        // --- Function to display login errors ---
+        function displayLoginError() {
+            const errorContainer = document.getElementById('error-message-container');
+            const params = new URLSearchParams(window.location.search);
+            const error = params.get('error');
+
+            if (error) {
+                let message = 'An unknown error occurred.';
+                switch (error) {
+                    case 'invalid_passcode':
+                        message = 'The email or passcode you entered is incorrect.';
+                        break;
+                    case 'not_found':
+                        message = 'No account found with that email address.';
+                        break;
+                    case 'missing_credentials':
+                        message = 'Please enter both email and passcode.';
+                        break;
+                    case 'server_error':
+                        message = 'The server encountered an error. Please try again later.';
+                        break;
+                }
+                errorContainer.innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+                        <span class="block sm:inline">${message}</span>
+                    </div>`;
+            }
+        }
+        displayLoginError();
+
+
+        // --- OS Detection & Login Button Rendering ---
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const loginButtonContainer = document.getElementById('loginButtonContainer');
+
+        if (isIOS) {
+            loginButtonContainer.innerHTML = `
+                <button onclick="openPasscodeModal()"
+                        class="w-full flex items-center justify-center py-2 sm:py-3 px-4 border border-gray-300 rounded-lg google-btn bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-lock mr-2 sm:mr-3"></i>
+                    <span class="text-sm sm:text-base">Sign in with Passcode</span>
+                </button>`;
+        } else {
+            loginButtonContainer.innerHTML = `
+                <button id="googleLoginBtn"
+                        class="w-full flex items-center justify-center py-2 sm:py-3 px-4 border border-gray-300 rounded-lg google-btn bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <img src="static/google.svg" alt="Google logo" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3">
+                    <span class="text-sm sm:text-base">Continue with Google</span>
+                </button>`;
+            document.getElementById('googleLoginBtn').addEventListener('click', googleLoginHandler);
+        }
+
+        async function googleLoginHandler() {
+            const btn = document.getElementById('googleLoginBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+            }
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await firebase.auth().signInWithPopup(provider);
                 const idToken = await result.user.getIdToken();
-    
-                const response = await fetch('/api/auth/google', {
+                const res = await fetch('/api/auth/google', {
                     method: 'POST',
                     credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id_token: idToken})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_token: idToken })
                 });
-    
-                const data = await response.json();
-    
-                if (response.ok) {
-                    // Store JWT token in localStorage for API calls
-                    localStorage.setItem('jwt_token', data.token);
-                    
-                    // Redirect based on user status
-                    if (data.is_new_user) {
-                        window.location.href = '/dashboard';
-                    } else {
-                        window.location.href = '/dashboard';
-                    }
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.replace('/dashboard');
                 } else {
                     throw new Error(data.error || 'Login failed');
                 }
@@ -163,10 +297,124 @@
                 alert('Login failed: ' + error.message);
                 firebase.auth().signOut();
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<img src="static/google.svg" alt="Google logo" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3"><span class="text-sm sm:text-base">Continue with Google</span>';
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<img src="static/google.svg" alt="Google logo" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3"><span class="text-sm sm:text-base">Continue with Google</span>';
+                }
+            }
+        }
+        
+        function openPasscodeModal() {
+            document.getElementById('passcodeLoginModal').classList.remove('hidden');
+        }
+        
+        document.getElementById('signUpLink').addEventListener('click', function(event) {
+            event.preventDefault();
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            if (isIOS) {
+                if (isPWA) {
+                    document.getElementById('pwaSignupModal').classList.remove('hidden');
+                } else {
+                    googleLoginHandler();
+                }
+            } else {
+                googleLoginHandler();
             }
         });
+
+
+        // --- PWA Installation Logic ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        const installModal = document.getElementById('installModal');
+        const androidBtn = document.getElementById('androidBtn');
+        const iosBtn = document.getElementById('iosBtn');
+        const closeModalBtn = document.getElementById('closeModal');
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        if (!isPWA) {
+            if (isIOS) {
+                installBtn.classList.remove('hidden');
+            }
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBtn.classList.remove('hidden');
+            });
+        }
+        
+        installBtn.addEventListener('click', () => {
+            if (isIOS) {
+                androidBtn.style.display = 'none';
+                iosBtn.style.display = 'flex';
+            } else {
+                iosBtn.style.display = 'none';
+                androidBtn.style.display = 'flex';
+            }
+            installModal.classList.remove('hidden');
+        });
+
+        androidBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                installModal.classList.add('hidden');
+            }
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            installModal.classList.add('hidden');
+        });
+
+
+        // --- Swipable iOS Guide Logic ---
+        const iosGuide = document.getElementById('iosGuide');
+        const closeGuideBtn = document.getElementById('closeGuide');
+        const slidesContainer = document.getElementById('slides');
+        const slides = Array.from(slidesContainer.children);
+        const dotsContainer = document.querySelector('.dots-container');
+        const dots = Array.from(dotsContainer.children);
+        let currentIndex = 0;
+        let touchStartX = 0;
+
+        function showSlide(index) {
+            slidesContainer.style.transform = `translateX(-${index * 100}%)`;
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('bg-blue-600', i === index);
+                dot.classList.toggle('bg-gray-300', i !== index);
+            });
+            currentIndex = index;
+        }
+
+        function handleSwipe(touchEndX) {
+            const swipeThreshold = 50; // Min pixels for a swipe
+            const swipeDistance = touchStartX - touchEndX;
+            if (swipeDistance > swipeThreshold && currentIndex < slides.length - 1) {
+                showSlide(currentIndex + 1); // Swipe Left
+            } else if (swipeDistance < -swipeThreshold && currentIndex > 0) {
+                showSlide(currentIndex - 1); // Swipe Right
+            }
+        }
+
+        iosBtn.addEventListener('click', () => {
+            installModal.classList.add('hidden');
+            iosGuide.classList.remove('hidden');
+            showSlide(0); // Reset to first slide every time it's opened
+        });
+
+        slidesContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        slidesContainer.addEventListener('touchend', (e) => {
+            handleSwipe(e.changedTouches[0].screenX);
+        });
+
+        closeGuideBtn.addEventListener('click', () => {
+            iosGuide.classList.add('hidden');
+        });
+        
     </script>
 </body>
 </html>
