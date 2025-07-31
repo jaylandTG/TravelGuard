@@ -14,6 +14,10 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  if (e.request.url.includes('/api/') || e.request.mode === 'navigate') {
+    return fetch(e.request);
+  }
+  
   e.respondWith(
     caches.match(e.request).then((response) => response || fetch(e.request))
   );

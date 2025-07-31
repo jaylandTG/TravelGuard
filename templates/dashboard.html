@@ -63,6 +63,28 @@
                     <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm">Continue</button>
                 </div>
             </div>
+             <!-- step2b = passcode -->
+            <div id="step2b" class="hidden step">
+            <h3 class="text-lg font-bold mb-3">🔑 Create 6-Digit Passcode</h3>
+            <p class="text-xs text-gray-600 mb-4">
+                This passcode lets you log in from the iOS Devices. Do <strong>not</strong> share it.
+            </p>
+
+            <label class="block text-sm font-medium text-gray-700 mb-1">New Passcode</label>
+            <input id="passcode1" type="password" maxlength="6" pattern="\d{6}" inputmode="numeric"
+                    class="w-full p-2 border rounded-lg text-sm mb-3"
+                    placeholder="e.g. 123456">
+
+            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Passcode</label>
+            <input id="passcode2" type="password" maxlength="6" pattern="\d{6}" inputmode="numeric"
+                    class="w-full p-2 border rounded-lg text-sm mb-4"
+                    placeholder="Retype 6 digits">
+
+            <div class="flex justify-between">
+                <button onclick="prevStep()" class="px-4 py-2 bg-gray-100 rounded text-sm">Back</button>
+                <button onclick="validatePasscode()" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">Next</button>
+            </div>
+            </div>
             <div id="step3" class="hidden step">
                 <h3 class="text-lg font-bold mb-3">🆘 Add Emergency Contact</h3>
                 <div class="space-y-3 mb-4">
@@ -72,7 +94,7 @@
                         <option value="family">Family</option>
                         <option value="friend">Friend</option>
                         <option value="colleague">Colleague</option>
-                        <option value="colleague">Spouse</option>
+                        <option value="spouse">Spouse</option>
                     </select>
                 </div>
                 <div class="flex gap-2">
@@ -780,42 +802,86 @@
         });
 
         let currentStep = 1;
-        function showStep(stepNumber) {
-            document.querySelectorAll('.step').forEach(step => {
-                step.classList.toggle('hidden', step.id !== `step${stepNumber}`);
-            });
+        const MAX_STEP = 5;   // 1→2→2b→3→4→5 (done)
+
+        function showStep(step) {
+        document.querySelectorAll('.step').forEach(el =>
+            el.classList.toggle('hidden', el.id !== `step${step}`)
+        );
         }
+
         function nextStep() {
-            currentStep = Math.min(currentStep + 1, 4);
+            if (currentStep === 2 && !validatePhone()) return; 
+            if (currentStep === 2) { 
+                currentStep = 2.5; showStep('2b'); return; 
+            }
+            if (currentStep === 2.5 && !validatePasscode()) return;
+
+            currentStep = Math.min(currentStep + 1, MAX_STEP);
             showStep(currentStep);
         }
+
         function prevStep() {
+            if (currentStep === 2.5) { currentStep = 2; showStep(2); return; }
+            if (currentStep === 3)   { currentStep = 2.5; showStep('2b'); return; }
             currentStep = Math.max(currentStep - 1, 1);
             showStep(currentStep);
         }
-        function completeOnboarding() {
-            const phone = document.getElementById('phoneInput')?.value;
+
+        // helpers
+        function validatePhone() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            if (!phone) { showToast('Phone is required', 'error'); return false; }
+            return true;
+        }
+
+        function validatePasscode() {
+            const p1 = document.getElementById('passcode1').value.trim();
+            const p2 = document.getElementById('passcode2').value.trim();
+            if (!/^\d{6}$/.test(p1) || !/^\d{6}$/.test(p2)) {
+                showToast('Exactly 6 digits required', 'error'); 
+                console.log('FALSE')
+                return false;
+                
+            }
+            if (p1 !== p2) { 
+                showToast('Passcodes do not match', 'error'); 
+                console.log('FALSE')
+                return false; 
+            }
+            console.log('TRUE')
+            window.tempPasscode = p1;   
+            currentStep = 3;           
+            showStep(currentStep);
+        }
+
+        async function completeOnboarding() {
+            const phone   = document.getElementById('phoneInput').value.trim();
             const contact = {
-                name: document.getElementById('contactName')?.value,
-                phone: document.getElementById('contactPhone')?.value,
-                relationship: document.getElementById('contactRelation')?.value
+                name: document.getElementById('contactName').value.trim(),
+                phone: document.getElementById('contactPhone').value.trim(),
+                relationship: document.getElementById('contactRelation').value
             };
-            fetch('/api/complete-profile', {
+            const body = { phone, contact, passcode: window.tempPasscode };
+
+            const res = await fetch('/api/complete-profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ phone, contact })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showStep(4);
-                    setTimeout(() => {
-                        document.getElementById('onboardingModal')?.classList.add('hidden');
-                    }, 2500);
-                }
-            })
-            .catch(() => showStep('Error'));
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+            if (data.status === 'success') {
+                showStep(4);  
+                setTimeout(() => document.getElementById('onboardingModal').classList.add('hidden'), 2500);
+            } else {
+                showToast(data.error || 'Error', 'error');
+            }
+        }
+
+        function closeOnboardingModal() {
+            document.getElementById('onboardingModal')?.classList.add('hidden');
         }
 
         let locationSharingData = {

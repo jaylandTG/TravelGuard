@@ -5,7 +5,7 @@
 # --- Standard Library Imports ---
 import os
 import threading
-import datetime
+from datetime import datetime, timedelta, timezone
 import uuid
 from functools import wraps
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
@@ -15,6 +15,7 @@ from flask import Flask, render_template, request, jsonify, make_response, redir
 from flask_caching import Cache
 from flask_compress import Compress
 import jwt
+import bcrypt
 from dotenv import load_dotenv
 
 # --- Firebase & Google Cloud Imports ---
@@ -558,7 +559,7 @@ def google_auth():
             'email': decoded_token['email'],
             'name': decoded_token.get('name', ''),
             'last_login': firestore.SERVER_TIMESTAMP,
-            'profile_complete': not is_new_user
+            'profile_complete': False  
         }
         user_ref.set(user_data, merge=True)
 
@@ -569,7 +570,7 @@ def google_auth():
         payload = {
             'user_id': user_id,
             'email': decoded_token['email'],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=JWT_EXP_DELTA_SECONDS)
+            'exp': datetime.now(timezone.utc) + timedelta(hours=24)
         }
         jwt_token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
@@ -614,30 +615,29 @@ def get_user_profile(current_user: str):
 @app.route('/api/complete-profile', methods=['POST'])
 @token_required
 def complete_profile(current_user: str):
-    """
-    Completes a new user's profile by adding phone number and an initial
-    emergency contact. Requires authentication.
-
-    Args:
-        current_user (str): The ID of the authenticated user.
-
-    Returns:
-        Response: A JSON response indicating success or failure of the profile update.
-    """
     data = request.json
+    print(f"DEBUGGER {data}")
     if not data:
         return jsonify({"status": "error", "message": "No data provided"}), 400
 
     try:
+        user_ref = USER_COLLECTION.document(current_user)
+
+        # Save 6-digit passcode if provided
+        if passcode := data.get('passcode'):
+            hashed = bcrypt.hashpw(passcode.encode(), bcrypt.gensalt())
+            executor.submit(user_ref.update, {'passcode_hash': hashed.decode()})
+
+        # Update basic profile
         update_data = {
             'phone': data.get('phone'),
-            'name': data.get('name'),
+            # 'name': data.get('name'),
             'profile_complete': True,
             'updated_at': firestore.SERVER_TIMESTAMP
         }
-        user_ref = USER_COLLECTION.document(current_user)
         executor.submit(user_ref.update, update_data)
 
+        # Add emergency contact if provided
         if contact := data.get('contact'):
             contact_data = {
                 'name': contact.get('name'),
@@ -652,6 +652,47 @@ def complete_profile(current_user: str):
         app.logger.error(f"Profile completion error: {e}", exc_info=True)
         return jsonify({"status": "error", "message": "Internal server error"}), 500
 
+@app.route('/api/login-passcode', methods=['POST'])
+def login_passcode():
+    try:
+        email = request.form.get('email', '').strip()
+        code  = request.form.get('passcode', '').strip()
+
+        if not email or not code:
+            return redirect(url_for('home', error='missing_credentials'))
+
+        user_docs = USER_COLLECTION.where('email', '==', email).limit(1).get()
+        if not user_docs:
+            return redirect(url_for('home', error='not_found'))
+
+        user_doc = user_docs[0]
+        user_dict = user_doc.to_dict()
+        hashed = user_dict.get('passcode_hash', '')
+
+        if not hashed or not bcrypt.checkpw(code.encode(), hashed.encode()):
+            return redirect(url_for('home', error='invalid_passcode'))
+
+        payload = {
+            'user_id': user_doc.id,
+            'exp': datetime.now(timezone.utc) + timedelta(hours=24)
+        }
+        token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+        response = make_response(redirect(url_for('dashboard')))
+        
+        response.set_cookie(
+            'jwt_token',
+            token,
+            httponly=True,
+            secure=(FLASK_ENV == 'production'), 
+            samesite='Lax',
+            max_age=24 * 3600
+        )
+        return response
+
+    except Exception as e:
+        app.logger.error(f"Passcode login error: {e}", exc_info=True)
+        return redirect(url_for('home', error='server_error'))
 
 # --- Chatbot API Routes ---
 
